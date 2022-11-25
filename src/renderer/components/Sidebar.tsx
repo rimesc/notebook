@@ -71,10 +71,14 @@ const Sidebar = ({ width }: Props) => {
         open
       >
         <div style={{ marginTop: 30 }}>
-          <List dense>
-            <ListSubheader component="div" id="nested-list-subheader">
-              Folders
-            </ListSubheader>
+          <List
+            dense
+            subheader={
+              <ListSubheader component="div" id="nested-list-subheader">
+                Folders
+              </ListSubheader>
+            }
+          >
             {folders &&
               folders.map((folder) => [
                 <ListItem key={folder} disablePadding>
