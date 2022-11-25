@@ -6,19 +6,10 @@ import Sidebar from './components/Sidebar';
 
 const drawerWidth = 240;
 
-const files = {
-  'Folder One': ['File 1', 'File 2', 'File 3'],
-  'Folder Two': ['File 4', 'File 5'],
-} as { [folder: string]: string[] };
-
 const Hello = () => {
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar
-        width={drawerWidth}
-        folders={Object.keys(files)}
-        fetchFiles={(folder) => files[folder]}
-      />
+      <Sidebar width={drawerWidth} />
       <Box
         component="main"
         sx={{

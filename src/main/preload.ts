@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'ipc-example';
+export type Channels = 'list-folders' | 'list-files';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
