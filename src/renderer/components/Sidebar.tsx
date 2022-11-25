@@ -1,3 +1,4 @@
+/* eslint no-console: off */
 import { Article, ExpandLess, ExpandMore, Folder } from '@mui/icons-material';
 import {
   Box,
@@ -35,18 +36,14 @@ const Sidebar = ({ width }: Props) => {
     {}
   );
 
-  window.electron.ipcRenderer.once('list-folders', (f) => {
-    setFolders(f as string[]);
-  });
-  window.electron.ipcRenderer.once('list-files', (f, ff) => {
-    dispatch({ folder: f as string, files: ff as string[] });
-  });
-
   if (folders === undefined) {
-    window.electron.ipcRenderer.sendMessage('list-folders', []);
+    window.electron.listFolders().then(setFolders).catch(console.log);
   }
   if (open !== undefined && !(open in files)) {
-    window.electron.ipcRenderer.sendMessage('list-files', [open]);
+    window.electron
+      .listFiles(open)
+      .then((f) => dispatch({ folder: open, files: f }))
+      .catch(console.log);
   }
 
   const handleClick = (item: string) => {
@@ -79,33 +76,36 @@ const Sidebar = ({ width }: Props) => {
               Folders
             </ListSubheader>
             {folders &&
-              folders.map((folder) => (
-                <>
-                  <ListItem key={folder} disablePadding>
-                    <ListItemButton onClick={() => handleClick(folder)}>
-                      <ListItemIcon>
-                        <Folder />
-                      </ListItemIcon>
-                      <ListItemText primary={folder} />
-                      {open === folder ? <ExpandLess /> : <ExpandMore />}
-                    </ListItemButton>
-                  </ListItem>
-                  <Collapse in={open === folder} timeout="auto" unmountOnExit>
-                    <List dense component="div" disablePadding>
-                      {(files[folder] || []).map((text) => (
-                        <ListItem key={text} disablePadding>
-                          <ListItemButton sx={{ pl: 4 }}>
-                            <ListItemIcon>
-                              <Article />
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Collapse>
-                </>
-              ))}
+              folders.map((folder) => [
+                <ListItem key={folder} disablePadding>
+                  <ListItemButton onClick={() => handleClick(folder)}>
+                    <ListItemIcon>
+                      <Folder />
+                    </ListItemIcon>
+                    <ListItemText primary={folder} />
+                    {open === folder ? <ExpandLess /> : <ExpandMore />}
+                  </ListItemButton>
+                </ListItem>,
+                <Collapse
+                  key={`${folder}-contents`}
+                  in={open === folder}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <List dense component="div" disablePadding>
+                    {(files[folder] || []).map((text) => (
+                      <ListItem key={text} disablePadding>
+                        <ListItemButton sx={{ pl: 4 }}>
+                          <ListItemIcon>
+                            <Article />
+                          </ListItemIcon>
+                          <ListItemText primary={text} />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>,
+              ])}
           </List>
         </div>
       </Drawer>

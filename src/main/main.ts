@@ -12,7 +12,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
-import { listFiles, listFolders } from './files';
+import { listFolders, listNotes } from './files';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -26,15 +26,8 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('list-folders', async (event) => {
-  const folders = listFolders();
-  event.reply('list-folders', folders);
-});
-
-ipcMain.on('list-files', async (event, [folder]) => {
-  const files = listFiles(folder);
-  event.reply('list-files', folder, files);
-});
+ipcMain.handle('list-folders', listFolders);
+ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

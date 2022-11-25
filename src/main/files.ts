@@ -19,20 +19,38 @@ function isMarkdown(p: string): boolean {
   return isFile(p) && path.extname(p).toLowerCase() === '.md';
 }
 
-export function listFolders(): string[] {
-  return fs
-    .readdirSync(root)
-    .map((f) => path.join(root, f))
-    .filter((d) => isDirectory(d) && !isHidden(d))
-    .map((f) => path.basename(f));
+async function listFiles(dir: string): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    fs.readdir(dir, (err, files) => {
+      if (err) {
+        reject(err);
+      } else {
+        // return the full path to the file
+        resolve(files.map((name) => path.join(dir, name)));
+      }
+    });
+  });
 }
 
-export function listFiles(folder: string): string[] {
-  const p = path.join(root, folder);
-  return fs
-    .readdirSync(p)
-    .map((f) => path.join(p, f))
-    .filter((n) => isMarkdown(n) && !isHidden(n))
-    .map((n) => path.basename(n))
-    .map((n) => n.substring(0, n.lastIndexOf('.')));
+/**
+ * Lists the top-level folders.
+ * @returns list of folder names.
+ */
+export async function listFolders(): Promise<string[]> {
+  const files = await listFiles(root);
+  return files
+    .filter((file) => isDirectory(file) && !isHidden(file))
+    .map((file) => path.basename(file));
+}
+
+/**
+ * Lists the notes in the given folder.
+ * @param folder name of the folder.
+ * @returns list of note names.
+ */
+export async function listNotes(folder: string): Promise<string[]> {
+  const files = await listFiles(path.join(root, folder));
+  return files
+    .filter((file) => isMarkdown(file) && !isHidden(file))
+    .map((file) => path.basename(file, '.md'));
 }
