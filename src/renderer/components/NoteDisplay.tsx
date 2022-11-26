@@ -1,4 +1,6 @@
 /* eslint no-console: off */
+import DOMPurify from 'dompurify';
+import { marked } from 'marked';
 import React from 'react';
 import { NoteKey } from '../model';
 
@@ -18,7 +20,8 @@ const NoteDisplay = ({ note }: Props) => {
     }
   }, [note]);
 
-  return <div>{content}</div>;
+  // eslint-disable-next-line react/no-danger
+  return content ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(content)) }} /> : <></>;
 };
 
 export default NoteDisplay;
