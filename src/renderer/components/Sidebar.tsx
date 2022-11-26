@@ -12,8 +12,8 @@ interface Props {
 }
 
 // Electron-specific CSS (not directly supported by React API)
-const draggable = { 'app-region': 'drag' };
-const notDraggable = { 'app-region': 'no-drag' };
+const draggable = { appRegion: 'drag' };
+const notDraggable = { appRegion: 'no-drag' };
 
 /**
  * Sidebar displaying a list of collapsible folders with their files.
