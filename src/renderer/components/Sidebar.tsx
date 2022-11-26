@@ -28,10 +28,7 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
   const [folders, setFolders] = React.useState<string[] | undefined>(undefined);
   const [open, setOpen] = React.useState<string | undefined>(undefined);
   const [files, dispatch] = React.useReducer(
-    (
-      f: { [folder: string]: string[] },
-      action: { folder: string; files: string[] }
-    ) => {
+    (f: { [folder: string]: string[] }, action: { folder: string; files: string[] }) => {
       const newState = { ...f };
       newState[action.folder] = action.files;
       return newState;
@@ -60,11 +57,7 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
   };
 
   return (
-    <Box
-      component="nav"
-      sx={{ width: { sm: width }, flexShrink: { sm: 0 } }}
-      aria-label="mailbox folders"
-    >
+    <Box component="nav" sx={{ width: { sm: width }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
       <Drawer
         variant="permanent"
         sx={{
@@ -99,21 +92,12 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
                     {open === folder ? <ExpandLess /> : <ExpandMore />}
                   </ListItemButton>
                 </ListItem>,
-                <Collapse
-                  key={`${folder}-contents`}
-                  in={open === folder}
-                  timeout="auto"
-                  unmountOnExit
-                >
+                <Collapse key={`${folder}-contents`} in={open === folder} timeout="auto" unmountOnExit>
                   <List dense component="div" disablePadding>
                     {(files[folder] || []).map((text) => (
                       <ListItem key={text} disablePadding>
                         <ListItemButton
-                          selected={
-                            selected &&
-                            folder === selected.folder &&
-                            text === selected.note
-                          }
+                          selected={selected && folder === selected.folder && text === selected.note}
                           sx={{ pl: 4 }}
                           onClick={() => handleNoteClick(folder, text)}
                         >

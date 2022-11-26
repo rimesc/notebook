@@ -32,10 +32,7 @@ async function listFiles(dir: string): Promise<string[]> {
   });
 }
 
-async function readFile(
-  file: string,
-  encoding: BufferEncoding
-): Promise<string> {
+async function readFile(file: string, encoding: BufferEncoding): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     fs.readFile(file, (err, buffer) => {
       if (err) {
@@ -53,9 +50,7 @@ async function readFile(
  */
 export async function listFolders(): Promise<string[]> {
   const files = await listFiles(root);
-  return files
-    .filter((file) => isDirectory(file) && !isHidden(file))
-    .map((file) => path.basename(file));
+  return files.filter((file) => isDirectory(file) && !isHidden(file)).map((file) => path.basename(file));
 }
 
 /**
@@ -65,9 +60,7 @@ export async function listFolders(): Promise<string[]> {
  */
 export async function listNotes(folder: string): Promise<string[]> {
   const files = await listFiles(path.join(root, folder));
-  return files
-    .filter((file) => isMarkdown(file) && !isHidden(file))
-    .map((file) => path.basename(file, '.md'));
+  return files.filter((file) => isMarkdown(file) && !isHidden(file)).map((file) => path.basename(file, '.md'));
 }
 
 /**
