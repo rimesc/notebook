@@ -70,8 +70,8 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     titleBarStyle: 'hidden',
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1280,
+    height: 960,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.erb/dll/preload.js'),
