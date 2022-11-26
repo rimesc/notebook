@@ -29,7 +29,12 @@ const NoteDisplay = ({ note }: Props) => {
 
   React.useEffect(() => {
     if (note) {
-      window.electron.fetchNote(note.folder, note.note).then(setContent).catch(console.log);
+      const fetchNote = async () => {
+        const markdown = await window.electron.fetchNote(note.folder, note.note);
+        setContent(markdown);
+        window.scrollTo(0, 0);
+      };
+      fetchNote();
     }
   }, [note]);
 
