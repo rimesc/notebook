@@ -12,16 +12,19 @@ import {
   ListSubheader,
 } from '@mui/material';
 import React from 'react';
+import { NoteKey } from '../model';
 
 interface Props {
   /** Width of the sidebar, in pixels */
   width: number;
+  selected: NoteKey | undefined;
+  onSelect: (note: NoteKey) => void;
 }
 
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
-const Sidebar = ({ width }: Props) => {
+const Sidebar = ({ width, selected, onSelect }: Props) => {
   const [folders, setFolders] = React.useState<string[] | undefined>(undefined);
   const [open, setOpen] = React.useState<string | undefined>(undefined);
   const [files, dispatch] = React.useReducer(
@@ -41,13 +44,19 @@ const Sidebar = ({ width }: Props) => {
   }
   if (open !== undefined && !(open in files)) {
     window.electron
-      .listFiles(open)
+      .listNotes(open)
       .then((f) => dispatch({ folder: open, files: f }))
       .catch(console.log);
   }
 
-  const handleClick = (item: string) => {
-    setOpen(open !== item ? item : undefined);
+  const handleFolderClick = (folder: string) => {
+    setOpen(open !== folder ? folder : undefined);
+  };
+
+  const handleNoteClick = (folder: string, note: string) => {
+    if (!selected || selected.folder !== folder || selected.note !== note) {
+      onSelect({ folder, note });
+    }
   };
 
   return (
@@ -82,7 +91,7 @@ const Sidebar = ({ width }: Props) => {
             {folders &&
               folders.map((folder) => [
                 <ListItem key={folder} disablePadding>
-                  <ListItemButton onClick={() => handleClick(folder)}>
+                  <ListItemButton onClick={() => handleFolderClick(folder)}>
                     <ListItemIcon>
                       <Folder />
                     </ListItemIcon>
@@ -99,7 +108,15 @@ const Sidebar = ({ width }: Props) => {
                   <List dense component="div" disablePadding>
                     {(files[folder] || []).map((text) => (
                       <ListItem key={text} disablePadding>
-                        <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemButton
+                          selected={
+                            selected &&
+                            folder === selected.folder &&
+                            text === selected.note
+                          }
+                          sx={{ pl: 4 }}
+                          onClick={() => handleNoteClick(folder, text)}
+                        >
                           <ListItemIcon>
                             <Article />
                           </ListItemIcon>

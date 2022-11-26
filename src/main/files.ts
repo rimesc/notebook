@@ -32,6 +32,21 @@ async function listFiles(dir: string): Promise<string[]> {
   });
 }
 
+async function readFile(
+  file: string,
+  encoding: BufferEncoding
+): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    fs.readFile(file, (err, buffer) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(buffer.toString(encoding));
+      }
+    });
+  });
+}
+
 /**
  * Lists the top-level folders.
  * @returns list of folder names.
@@ -53,4 +68,14 @@ export async function listNotes(folder: string): Promise<string[]> {
   return files
     .filter((file) => isMarkdown(file) && !isHidden(file))
     .map((file) => path.basename(file, '.md'));
+}
+
+/**
+ * Fetches the contents of the given note.
+ * @param folder name of the folder containing the note.
+ * @param file name of the note.
+ * @returns contents of the note.
+ */
+export async function fetchNote(folder: string, file: string): Promise<string> {
+  return readFile(path.join(root, folder, `${file}.md`), 'utf-8');
 }

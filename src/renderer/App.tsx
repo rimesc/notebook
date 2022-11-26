@@ -1,15 +1,33 @@
 import { Box } from '@mui/material';
+import React from 'react';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
 import Sidebar from './components/Sidebar';
+import { NoteKey } from './model';
 
 const drawerWidth = 240;
 
 const Hello = () => {
+  const [selected, setSelected] = React.useState<NoteKey | undefined>(
+    undefined
+  );
+
+  React.useEffect(() => {
+    if (selected) {
+      const fetchNote = async () => {
+        console.log(
+          await window.electron.fetchNote(selected.folder, selected.note)
+        );
+      };
+
+      fetchNote();
+    }
+  }, [selected]);
+
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar width={drawerWidth} />
+      <Sidebar width={drawerWidth} selected={selected} onSelect={setSelected} />
       <Box
         component="main"
         sx={{
