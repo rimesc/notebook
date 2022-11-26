@@ -11,6 +11,10 @@ interface Props {
   onSelect: (note: NoteKey) => void;
 }
 
+// Electron-specific CSS (not directly supported by React API)
+const draggable = { 'app-region': 'drag' };
+const notDraggable = { 'app-region': 'no-drag' };
+
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
@@ -55,6 +59,7 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
             width,
+            ...draggable,
           },
           '& .MuiListItemIcon-root': {
             minWidth: 36,
@@ -62,11 +67,11 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
         }}
         open
       >
-        <div style={{ marginTop: 30 }}>
+        <div style={{ marginTop: 30, height: 'calc(100% - 30px)', ...notDraggable }}>
           <List
             dense
             subheader={
-              <ListSubheader component="div" id="nested-list-subheader">
+              <ListSubheader component="div" id="nested-list-subheader" sx={{ userSelect: 'none' }}>
                 Folders
               </ListSubheader>
             }
