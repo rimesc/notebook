@@ -51,7 +51,7 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
   };
 
   return (
-    <Box component="nav" sx={{ width: { sm: width }, flexShrink: { sm: 0 } }} aria-label="mailbox folders">
+    <Box component="nav" sx={{ width: { sm: width }, flexShrink: { sm: 0 } }} aria-label="Folders">
       <Drawer
         variant="permanent"
         sx={{
