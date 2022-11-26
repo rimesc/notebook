@@ -1,18 +1,8 @@
 /* eslint no-console: off */
-import { Article, ExpandLess, ExpandMore, Folder } from '@mui/icons-material';
-import {
-  Box,
-  Collapse,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-} from '@mui/material';
+import { Box, Drawer, List, ListSubheader } from '@mui/material';
 import React from 'react';
 import { NoteKey } from '../model';
+import SideBarFolder from './SidebarFolder';
 
 interface Props {
   /** Width of the sidebar, in pixels */
@@ -82,35 +72,16 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
             }
           >
             {folders &&
-              folders.map((folder) => [
-                <ListItem key={folder} disablePadding>
-                  <ListItemButton onClick={() => handleFolderClick(folder)}>
-                    <ListItemIcon>
-                      <Folder />
-                    </ListItemIcon>
-                    <ListItemText primary={folder} />
-                    {open === folder ? <ExpandLess /> : <ExpandMore />}
-                  </ListItemButton>
-                </ListItem>,
-                <Collapse key={`${folder}-contents`} in={open === folder} timeout="auto" unmountOnExit>
-                  <List dense component="div" disablePadding>
-                    {(files[folder] || []).map((text) => (
-                      <ListItem key={text} disablePadding>
-                        <ListItemButton
-                          selected={selected && folder === selected.folder && text === selected.note}
-                          sx={{ pl: 4 }}
-                          onClick={() => handleNoteClick(folder, text)}
-                        >
-                          <ListItemIcon>
-                            <Article />
-                          </ListItemIcon>
-                          <ListItemText primary={text} />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>,
-              ])}
+              folders.map((folder) => (
+                <SideBarFolder
+                  key={folder}
+                  name={folder}
+                  open={open === folder}
+                  selected={selected && folder === selected.folder ? selected.note : undefined}
+                  onSelect={() => handleFolderClick(folder)}
+                  onSelectNote={(note) => handleNoteClick(folder, note)}
+                />
+              ))}
           </List>
         </div>
       </Drawer>
