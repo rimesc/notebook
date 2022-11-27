@@ -1,7 +1,7 @@
 /* eslint no-console: off */
 import { Box, Drawer, List, ListSubheader } from '@mui/material';
 import React from 'react';
-import { NoteKey } from '../model';
+import { NoteKey } from '../../model';
 import SideBarFolder from './SidebarFolder';
 
 interface Props {
