@@ -1,7 +1,7 @@
-/* eslint no-console: off */
 import DOMPurify from 'dompurify';
+import furigana from 'furigana-markdown-it';
 import hljs from 'highlight.js';
-import { marked } from 'marked';
+import MarkdownIt from 'markdown-it';
 import React from 'react';
 import { NoteKey } from '../model';
 import './NoteDisplay.css';
@@ -10,7 +10,7 @@ interface Props {
   note: NoteKey | undefined;
 }
 
-marked.setOptions({
+const md = new MarkdownIt({
   highlight: (code, lang) => {
     const result = hljs.highlight(lang, code);
     if (result.errorRaised) {
@@ -19,7 +19,7 @@ marked.setOptions({
     return result.value;
   },
   langPrefix: 'hljs language-',
-});
+}).use(furigana({}));
 
 /**
  * Displays a formatted note.
@@ -39,7 +39,7 @@ const NoteDisplay = ({ note }: Props) => {
   }, [note]);
 
   // eslint-disable-next-line react/no-danger
-  return content ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(content)) }} /> : <></>;
+  return content ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(content)) }} /> : <></>;
 };
 
 export default NoteDisplay;
