@@ -6,6 +6,8 @@ contextBridge.exposeInMainWorld('electron', {
   listFolders: () => ipcRenderer.invoke('list-folders') as Promise<string[]>,
   listNotes: (folder: string) => ipcRenderer.invoke('list-notes', folder) as Promise<string[]>,
   fetchNote: (folder: string, note: string) => ipcRenderer.invoke('fetch-note', folder, note) as Promise<string>,
+  saveNote: (folder: string, note: string, content: string) =>
+    ipcRenderer.invoke('save-note', folder, note, content) as Promise<void>,
   ipcRenderer: {
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);

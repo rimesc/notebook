@@ -12,7 +12,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
-import { fetchNote, listFolders, listNotes } from './files';
+import { fetchNote, listFolders, listNotes, saveNote } from './files';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -29,6 +29,7 @@ let mainWindow: BrowserWindow | null = null;
 ipcMain.handle('list-folders', listFolders);
 ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
 ipcMain.handle('fetch-note', (_, folder, note) => fetchNote(folder, note));
+ipcMain.handle('save-note', (_, folder, note, content) => saveNote(folder, note, content));
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
