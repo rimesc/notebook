@@ -3,6 +3,7 @@ import { Box, IconButton, Toolbar } from '@mui/material';
 import React from 'react';
 import { NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
+import NoteEditor from './NoteEditor';
 
 interface Props {
   /** Width, in pixels */
@@ -11,9 +12,12 @@ interface Props {
 }
 const NotePane = ({ width, note }: Props) => {
   const [content, setContent] = React.useState<string | undefined>(undefined);
+  const [modified, setModified] = React.useState<boolean>(false);
   const [mode, setMode] = React.useState<'edit' | 'view'>('view');
 
   React.useEffect(() => {
+    setContent(undefined);
+    setModified(false);
     if (note) {
       const fetchNote = async () => {
         const markdown = await window.electron.fetchNote(note.folder, note.note);
@@ -24,7 +28,23 @@ const NotePane = ({ width, note }: Props) => {
     }
   }, [note]);
 
-  const toggleMode = () => setMode(mode === 'view' ? 'edit' : 'view');
+  const toggleMode = () => {
+    setMode(mode === 'view' ? 'edit' : 'view');
+    if (modified) {
+      if (note && content) {
+        const saveNote = async () => {
+          await window.electron.saveNote(note.folder, note.note, content);
+          setModified(false);
+        };
+        saveNote();
+      }
+    }
+  };
+
+  const contentChanged = (newContent: string) => {
+    setContent(newContent);
+    setModified(true);
+  };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width }}>
@@ -41,7 +61,11 @@ const NotePane = ({ width, note }: Props) => {
         </IconButton>
       </Toolbar>
       <Box component="main" sx={{ flexGrow: 1, p: 3, pt: 0 }}>
-        <NoteDisplay markdown={content} />
+        {mode === 'view' ? (
+          <NoteDisplay markdown={content} />
+        ) : (
+          <NoteEditor markdown={content} onChange={contentChanged} />
+        )}
       </Box>
     </Box>
   );

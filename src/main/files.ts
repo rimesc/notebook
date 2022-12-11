@@ -44,6 +44,18 @@ async function readFile(file: string, encoding: BufferEncoding): Promise<string>
   });
 }
 
+async function writeFile(file: string, content: string, encoding: BufferEncoding): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    fs.writeFile(file, Buffer.from(content, encoding), (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 /**
  * Lists the top-level folders.
  * @returns list of folder names.
@@ -71,4 +83,14 @@ export async function listNotes(folder: string): Promise<string[]> {
  */
 export async function fetchNote(folder: string, file: string): Promise<string> {
   return readFile(path.join(root, folder, `${file}.md`), 'utf-8');
+}
+
+/**
+ * Saves the given note.
+ * @param folder name of the folder containing the note.
+ * @param file name of the note.
+ * @param content contents of the note.
+ */
+export async function saveNote(folder: string, file: string, content: string): Promise<void> {
+  return writeFile(path.join(root, folder, `${file}.md`), content, 'utf-8');
 }
