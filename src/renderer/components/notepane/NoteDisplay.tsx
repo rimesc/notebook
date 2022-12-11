@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import DOMPurify from 'dompurify';
 import furigana from 'furigana-markdown-it';
 import hljs from 'highlight.js';
@@ -23,8 +24,16 @@ const md = new MarkdownIt({
  * Displays a formatted note.
  */
 const NoteDisplay = ({ markdown }: Props) => {
-  // eslint-disable-next-line react/no-danger
-  return markdown ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }} /> : <></>;
+  return (
+    <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
+      <Box sx={{ p: 3 }}>
+        {
+          // eslint-disable-next-line react/no-danger
+          markdown ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }} /> : <></>
+        }
+      </Box>
+    </Box>
+  );
 };
 
 export default NoteDisplay;

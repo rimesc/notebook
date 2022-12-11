@@ -1,5 +1,7 @@
 import { Edit, EditOff } from '@mui/icons-material';
 import { Box, IconButton, Toolbar } from '@mui/material';
+import { Allotment } from 'allotment';
+import 'allotment/dist/style.css';
 import React from 'react';
 import { NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
@@ -47,7 +49,7 @@ const NotePane = ({ width, note }: Props) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width, height: '100vh' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'end' }}>
         <IconButton
           edge="end"
@@ -60,12 +62,15 @@ const NotePane = ({ width, note }: Props) => {
           {mode === 'view' ? <Edit /> : <EditOff />}
         </IconButton>
       </Toolbar>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, pt: 0 }}>
-        {mode === 'view' ? (
-          <NoteDisplay markdown={content} />
-        ) : (
-          <NoteEditor markdown={content} onChange={contentChanged} />
-        )}
+      <Box component="main" sx={{ height: '100%' }}>
+        <Allotment vertical>
+          <Allotment.Pane>
+            <NoteDisplay markdown={content} />
+          </Allotment.Pane>
+          <Allotment.Pane visible={mode === 'edit'}>
+            <NoteEditor markdown={content} onChange={contentChanged} />
+          </Allotment.Pane>
+        </Allotment>
       </Box>
     </Box>
   );
