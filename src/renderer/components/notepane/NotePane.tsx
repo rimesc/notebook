@@ -1,5 +1,5 @@
 import { Article, Edit } from '@mui/icons-material';
-import { Box, ToggleButton, ToggleButtonGroup, Toolbar } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup, Toolbar, useTheme } from '@mui/material';
 import React from 'react';
 import { NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
@@ -29,7 +29,6 @@ const NotePane = ({ width, note }: Props) => {
   }, [note]);
 
   const handleModeChange = (_: React.MouseEvent<HTMLElement>, newMode: 'edit' | 'view') => {
-    console.log(newMode);
     if (newMode) {
       setMode(newMode);
     }
@@ -49,10 +48,15 @@ const NotePane = ({ width, note }: Props) => {
     setModified(true);
   };
 
+  const theme = useTheme();
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width, height: '100vh' }}>
       <Toolbar
-        sx={{ display: 'flex', justifyContent: 'end', borderBottom: 1, borderBottomColor: 'rgb(0, 0, 0, 0.12)' }}
+        sx={{
+          display: 'flex',
+          justifyContent: 'end',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
       >
         <ToggleButtonGroup
           color="primary"
