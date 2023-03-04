@@ -24,3 +24,7 @@ blockquote {
   padding-right: 1em;
   border-left: 0.25em solid rgb(208, 215, 222);
 }
+
+code, code.hljs {
+  background-color: rgb(246, 248, 250);
+}
