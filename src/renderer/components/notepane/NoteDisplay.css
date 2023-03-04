@@ -1,5 +1,9 @@
 @import "~highlight.js/styles/github.css";
 
+main {
+  color: rgb(0, 0, 0, 0.87);
+}
+
 table {
   border-spacing: 0;
   border-collapse: collapse;
