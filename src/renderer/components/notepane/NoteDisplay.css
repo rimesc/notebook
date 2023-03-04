@@ -1,1 +1,34 @@
 @import "~highlight.js/styles/github.css";
+
+main {
+  color: rgb(0, 0, 0, 0.87);
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid rgb(128, 128, 128);
+}
+
+th, td {
+  padding: 10px;
+}
+
+th {
+  background-color: rgb(246, 248, 250);
+}
+
+blockquote {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 1em;
+  padding-right: 1em;
+  border-left: 0.25em solid rgb(208, 215, 222);
+}
+
+code, code.hljs {
+  background-color: rgb(246, 248, 250);
+}
