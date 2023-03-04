@@ -1,6 +1,6 @@
 import { Article, Edit } from '@mui/icons-material';
-import { Box, ToggleButton, ToggleButtonGroup, Toolbar, useTheme } from '@mui/material';
-import React from 'react';
+import { AppBar, Box, styled, ToggleButton, ToggleButtonGroup, Toolbar, useTheme } from '@mui/material';
+import React, { useRef } from 'react';
 import { NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
 import NoteEditor from './NoteEditor';
@@ -49,32 +49,44 @@ const NotePane = ({ width, note }: Props) => {
   };
 
   const theme = useTheme();
+  const offsetRef = useRef<HTMLDivElement>(null);
+  const Offset = styled('div')(({ theme: t }) => t.mixins.toolbar);
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width, height: '100vh' }}>
-      <Toolbar
-        sx={{
-          display: 'flex',
-          justifyContent: 'end',
-          borderBottom: `1px solid ${theme.palette.divider}`,
-        }}
+    <Box sx={{ width, height: '100vh' }}>
+      <AppBar
+        color="default"
+        position="fixed"
+        sx={{ borderBottom: `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}
       >
-        <ToggleButtonGroup
-          color="primary"
-          size="small"
-          exclusive
-          value={note && mode}
-          onChange={handleModeChange}
-          disabled={!note}
+        <Toolbar
+          sx={{
+            display: 'flex',
+            justifyContent: 'end',
+          }}
         >
-          <ToggleButton value="view" aria-label="view">
-            <Article />
-          </ToggleButton>
-          <ToggleButton value="edit" aria-label="edit">
-            <Edit />
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Toolbar>
-      <Box component="main" sx={{ height: '100%' }}>
+          <ToggleButtonGroup
+            color="primary"
+            size="small"
+            exclusive
+            value={note && mode}
+            onChange={handleModeChange}
+            disabled={!note}
+          >
+            <ToggleButton value="view" aria-label="view">
+              <Article />
+            </ToggleButton>
+            <ToggleButton value="edit" aria-label="edit">
+              <Edit />
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Toolbar>
+      </AppBar>
+      <Offset ref={offsetRef} />
+      <Box
+        component="main"
+        sx={{ height: offsetRef.current ? `calc(100% - ${offsetRef.current.clientHeight}px)` : '100%' }}
+      >
         {mode === 'view' ? (
           <NoteDisplay markdown={content} />
         ) : (
