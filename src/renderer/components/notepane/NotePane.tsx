@@ -1,7 +1,5 @@
-import { Edit, EditOff } from '@mui/icons-material';
-import { Box, IconButton, Toolbar } from '@mui/material';
-import { Allotment } from 'allotment';
-import 'allotment/dist/style.css';
+import { Article, Edit } from '@mui/icons-material';
+import { Box, ToggleButton, ToggleButtonGroup, Toolbar } from '@mui/material';
 import React from 'react';
 import { NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
@@ -30,8 +28,11 @@ const NotePane = ({ width, note }: Props) => {
     }
   }, [note]);
 
-  const toggleMode = () => {
-    setMode(mode === 'view' ? 'edit' : 'view');
+  const handleModeChange = (_: React.MouseEvent<HTMLElement>, newMode: 'edit' | 'view') => {
+    console.log(newMode);
+    if (newMode) {
+      setMode(newMode);
+    }
     if (modified) {
       if (note && content) {
         const saveNote = async () => {
@@ -50,27 +51,31 @@ const NotePane = ({ width, note }: Props) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width, height: '100vh' }}>
-      <Toolbar sx={{ display: 'flex', justifyContent: 'end' }}>
-        <IconButton
-          edge="end"
-          color="inherit"
-          aria-label={mode === 'view' ? 'Edit' : 'View'}
-          sx={{ ml: 2 }}
+      <Toolbar
+        sx={{ display: 'flex', justifyContent: 'end', borderBottom: 1, borderBottomColor: 'rgb(0, 0, 0, 0.12)' }}
+      >
+        <ToggleButtonGroup
+          color="primary"
+          size="small"
+          exclusive
+          value={note && mode}
+          onChange={handleModeChange}
           disabled={!note}
-          onClick={toggleMode}
         >
-          {mode === 'view' ? <Edit /> : <EditOff />}
-        </IconButton>
+          <ToggleButton value="view" aria-label="view">
+            <Article />
+          </ToggleButton>
+          <ToggleButton value="edit" aria-label="edit">
+            <Edit />
+          </ToggleButton>
+        </ToggleButtonGroup>
       </Toolbar>
       <Box component="main" sx={{ height: '100%' }}>
-        <Allotment vertical>
-          <Allotment.Pane>
-            <NoteDisplay markdown={content} />
-          </Allotment.Pane>
-          <Allotment.Pane visible={mode === 'edit'}>
-            <NoteEditor markdown={content} onChange={contentChanged} />
-          </Allotment.Pane>
-        </Allotment>
+        {mode === 'view' ? (
+          <NoteDisplay markdown={content} />
+        ) : (
+          <NoteEditor markdown={content} onChange={contentChanged} />
+        )}
       </Box>
     </Box>
   );
