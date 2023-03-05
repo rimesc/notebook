@@ -104,6 +104,10 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
+  mainWindow.webContents.on('will-navigate', (e, url) => {
+    shell.openExternal(url);
+    e.preventDefault();
+  });
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
