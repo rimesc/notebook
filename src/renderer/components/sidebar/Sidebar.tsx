@@ -2,6 +2,7 @@
 import { Box, Drawer, List, ListSubheader } from '@mui/material';
 import React from 'react';
 import { NoteKey } from '../../model';
+import { draggable, notDraggable } from '../../util/draggable';
 import SideBarFolder from './SidebarFolder';
 
 interface Props {
@@ -10,10 +11,6 @@ interface Props {
   selected: NoteKey | undefined;
   onSelect: (note: NoteKey) => void;
 }
-
-// Electron-specific CSS (not directly supported by React API)
-const draggable = { appRegion: 'drag' };
-const notDraggable = { appRegion: 'no-drag' };
 
 /**
  * Sidebar displaying a list of collapsible folders with their files.

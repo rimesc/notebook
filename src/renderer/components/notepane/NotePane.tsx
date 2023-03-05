@@ -2,6 +2,7 @@ import { Article, Edit } from '@mui/icons-material';
 import { AppBar, Box, styled, ToggleButton, ToggleButtonGroup, Toolbar, useTheme } from '@mui/material';
 import React, { useRef } from 'react';
 import { NoteKey } from '../../model';
+import { draggable, notDraggable } from '../../util/draggable';
 import NoteDisplay from './NoteDisplay';
 import NoteEditor from './NoteEditor';
 
@@ -57,7 +58,7 @@ const NotePane = ({ width, note }: Props) => {
       <AppBar
         color="default"
         position="fixed"
-        sx={{ borderBottom: `1px solid ${theme.palette.divider}`, boxShadow: 'none' }}
+        sx={{ borderBottom: `1px solid ${theme.palette.divider}`, boxShadow: 'none', ...draggable }}
       >
         <Toolbar
           sx={{
@@ -72,6 +73,7 @@ const NotePane = ({ width, note }: Props) => {
             value={note && mode}
             onChange={handleModeChange}
             disabled={!note}
+            sx={{ ...notDraggable }}
           >
             <ToggleButton value="view" aria-label="view">
               <Article />
