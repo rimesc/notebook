@@ -11,6 +11,9 @@ interface Props {
 
 const md = new MarkdownIt({
   highlight: (code, lang) => {
+    if (!lang) {
+      return code;
+    }
     const result = hljs.highlight(lang, code);
     if (result.errorRaised) {
       throw result.errorRaised;
