@@ -29,6 +29,15 @@ blockquote {
   border-left: 0.25em solid rgb(208, 215, 222);
 }
 
-code, code.hljs {
-  background-color: rgb(246, 248, 250);
+pre code {
+  display: block;
+  padding: 1em;
+  background-color: rgb(246, 248, 250) !important;
+  color: rgb(36,41,46);
+  border: 1px solid rgb(188,189,190);
+  border-radius: 0.5em;
 }
+
+/* .hljs {
+  background-color: transparent;
+} */
