@@ -3,6 +3,8 @@ import DOMPurify from 'dompurify';
 import furigana from 'furigana-markdown-it';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
+import deflist from 'markdown-it-deflist';
+import footnote from 'markdown-it-footnote';
 import './NoteDisplay.css';
 
 interface Props {
@@ -10,6 +12,7 @@ interface Props {
 }
 
 const md = new MarkdownIt({
+  typographer: true,
   highlight: (code, lang) => {
     if (!lang) {
       return code;
@@ -21,7 +24,10 @@ const md = new MarkdownIt({
     return result.value;
   },
   langPrefix: 'hljs language-',
-}).use(furigana({}));
+})
+  .use(deflist)
+  .use(footnote)
+  .use(furigana({}));
 
 /**
  * Displays a formatted note.

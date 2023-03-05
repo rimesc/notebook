@@ -108,6 +108,8 @@
     "furigana-markdown-it": "^1.0.3",
     "highlight.js": "^11.7.0",
     "markdown-it": "^13.0.1",
+    "markdown-it-deflist": "^2.1.0",
+    "markdown-it-footnote": "^3.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.0"
@@ -122,6 +124,7 @@
     "@types/furigana-markdown-it": "^1.0.1",
     "@types/jest": "^28.1.7",
     "@types/markdown-it": "^12.2.3",
+    "@types/markdown-it-footnote": "^3.0.0",
     "@types/node": "18.7.6",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
