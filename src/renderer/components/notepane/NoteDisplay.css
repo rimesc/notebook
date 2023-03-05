@@ -78,3 +78,8 @@ pre code {
   border: 1px solid rgb(188, 189, 190);
   border-radius: 0.5em;
 }
+
+hr {
+  border: 0;
+  border-top: 1px solid rgb(208, 215, 222);
+}
