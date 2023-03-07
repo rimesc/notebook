@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import { fetchNote, listFolders, listNotes, saveNote } from './files';
 import MenuBuilder from './menu';
+import applicationState from './state';
 import { resolveHtmlPath } from './util';
 
 class AppUpdater {
@@ -26,6 +27,7 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+ipcMain.handle('root-directory', () => applicationState.rootDirectory);
 ipcMain.handle('list-folders', listFolders);
 ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
 ipcMain.handle('fetch-note', (_, folder, note) => fetchNote(folder, note));

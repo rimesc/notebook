@@ -1,6 +1,6 @@
 /* eslint no-console: off */
 import { Box, Drawer, List, ListSubheader } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NoteKey } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
 import SideBarFolder from './SidebarFolder';
@@ -8,6 +8,7 @@ import SideBarFolder from './SidebarFolder';
 interface Props {
   /** Width of the sidebar, in pixels */
   width: number;
+  location: string | undefined;
   selected: NoteKey | undefined;
   onSelect: (note: NoteKey) => void;
 }
@@ -15,7 +16,7 @@ interface Props {
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
-const Sidebar = ({ width, selected, onSelect }: Props) => {
+const Sidebar = ({ width, location, selected, onSelect }: Props) => {
   const [folders, setFolders] = React.useState<string[] | undefined>(undefined);
   const [open, setOpen] = React.useState<string | undefined>(undefined);
   const [files, dispatch] = React.useReducer(
@@ -27,15 +28,19 @@ const Sidebar = ({ width, selected, onSelect }: Props) => {
     {}
   );
 
-  if (folders === undefined) {
+  useEffect(() => {
+    setFolders([]);
     window.electron.listFolders().then(setFolders).catch(console.log);
-  }
-  if (open !== undefined && !(open in files)) {
-    window.electron
-      .listNotes(open)
-      .then((f) => dispatch({ folder: open, files: f }))
-      .catch(console.log);
-  }
+  }, [location]);
+
+  useEffect(() => {
+    if (open && !(open in files)) {
+      window.electron
+        .listNotes(open)
+        .then((f) => dispatch({ folder: open, files: f }))
+        .catch(console.log);
+    }
+  }, [files, open]);
 
   const handleFolderClick = (folder: string) => {
     setOpen(open !== folder ? folder : undefined);

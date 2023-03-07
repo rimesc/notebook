@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'list-folders' | 'list-notes';
+export type Channels = 'list-folders' | 'list-notes' | 'switched-root-directory';
 
 contextBridge.exposeInMainWorld('electron', {
+  rootDirectory: () => ipcRenderer.invoke('root-directory') as Promise<string>,
   listFolders: () => ipcRenderer.invoke('list-folders') as Promise<string[]>,
   listNotes: (folder: string) => ipcRenderer.invoke('list-notes', folder) as Promise<string[]>,
   fetchNote: (folder: string, note: string) => ipcRenderer.invoke('fetch-note', folder, note) as Promise<string>,
