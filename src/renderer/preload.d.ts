@@ -3,7 +3,7 @@ import { Channels } from 'main/preload';
 declare global {
   interface Window {
     electron: {
-      rootDirectory: () => Promise<string>;
+      getWorkspace: () => Promise<string>;
       listFolders: () => Promise<string[]>;
       listNotes: (folder: string) => Promise<string[]>;
       fetchNote: (folder: string, note: string) => Promise<string>;

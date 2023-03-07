@@ -27,7 +27,7 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.handle('root-directory', () => applicationState.rootDirectory);
+ipcMain.handle('get-workspace', () => applicationState.workspace);
 ipcMain.handle('list-folders', listFolders);
 ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
 ipcMain.handle('fetch-note', (_, folder, note) => fetchNote(folder, note));

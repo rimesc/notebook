@@ -10,25 +10,20 @@ import { NoteKey } from './model';
 const drawerWidth = 240;
 
 const MainView = () => {
-  const [location, setLocation] = useState<string | undefined>(undefined);
+  const [workspace, setWorkspace] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<NoteKey | undefined>(undefined);
 
   useEffect(() => {
-    window.electron
-      .rootDirectory()
-      .then((newLocation) => {
-        return setLocation(newLocation as string);
-      })
-      .catch(console.log);
-    return window.electron.ipcRenderer.on('switched-root-directory', (newLocation) => {
+    window.electron.getWorkspace().then(setWorkspace).catch(console.log);
+    return window.electron.ipcRenderer.on('switched-workspace', (newWorkspace) => {
       setSelected(undefined);
-      setLocation(newLocation as string);
+      setWorkspace(newWorkspace as string);
     });
   }, []);
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar width={drawerWidth} location={location} selected={selected} onSelect={setSelected} />
+      <Sidebar width={drawerWidth} workspace={workspace} selected={selected} onSelect={setSelected} />
       <NotePane width={`calc(100% - ${drawerWidth}px)`} note={selected} />
     </Box>
   );

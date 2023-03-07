@@ -60,7 +60,7 @@ async function writeFile(file: string, content: string, encoding: BufferEncoding
  * @returns list of folder names.
  */
 export async function listFolders(): Promise<string[]> {
-  const files = await listFiles(applicationState.rootDirectory);
+  const files = await listFiles(applicationState.workspace);
   return files.filter((file) => isDirectory(file) && !isHidden(file)).map((file) => path.basename(file));
 }
 
@@ -70,7 +70,7 @@ export async function listFolders(): Promise<string[]> {
  * @returns list of note names.
  */
 export async function listNotes(folder: string): Promise<string[]> {
-  const files = await listFiles(path.join(applicationState.rootDirectory, folder));
+  const files = await listFiles(path.join(applicationState.workspace, folder));
   return files.filter((file) => isMarkdown(file) && !isHidden(file)).map((file) => path.basename(file, '.md'));
 }
 
@@ -81,7 +81,7 @@ export async function listNotes(folder: string): Promise<string[]> {
  * @returns contents of the note.
  */
 export async function fetchNote(folder: string, file: string): Promise<string> {
-  return readFile(path.join(applicationState.rootDirectory, folder, `${file}.md`), 'utf-8');
+  return readFile(path.join(applicationState.workspace, folder, `${file}.md`), 'utf-8');
 }
 
 /**
@@ -91,5 +91,5 @@ export async function fetchNote(folder: string, file: string): Promise<string> {
  * @param content contents of the note.
  */
 export async function saveNote(folder: string, file: string, content: string): Promise<void> {
-  return writeFile(path.join(applicationState.rootDirectory, folder, `${file}.md`), content, 'utf-8');
+  return writeFile(path.join(applicationState.workspace, folder, `${file}.md`), content, 'utf-8');
 }

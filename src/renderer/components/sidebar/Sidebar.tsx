@@ -8,7 +8,7 @@ import SideBarFolder from './SidebarFolder';
 interface Props {
   /** Width of the sidebar, in pixels */
   width: number;
-  location: string | undefined;
+  workspace: string | undefined;
   selected: NoteKey | undefined;
   onSelect: (note: NoteKey) => void;
 }
@@ -16,7 +16,7 @@ interface Props {
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
-const Sidebar = ({ width, location, selected, onSelect }: Props) => {
+const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   const [folders, setFolders] = React.useState<string[] | undefined>(undefined);
   const [open, setOpen] = React.useState<string | undefined>(undefined);
   const [files, dispatch] = React.useReducer(
@@ -31,7 +31,7 @@ const Sidebar = ({ width, location, selected, onSelect }: Props) => {
   useEffect(() => {
     setFolders([]);
     window.electron.listFolders().then(setFolders).catch(console.log);
-  }, [location]);
+  }, [workspace]);
 
   useEffect(() => {
     if (open && !(open in files)) {

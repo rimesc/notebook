@@ -77,9 +77,9 @@ export default class MenuBuilder {
       label: 'File',
       submenu: [
         {
-          label: 'Open',
+          label: 'Open Workspace...',
           accelerator: 'Command+O',
-          click: () => this.doFileOpen(),
+          click: () => this.doOpenWorkspace(),
         },
       ],
     };
@@ -192,9 +192,9 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
+            label: '&Open Workspace...',
             accelerator: 'Ctrl+O',
-            onclick: () => this.doFileOpen(),
+            onclick: () => this.doOpenWorkspace(),
           },
           {
             label: '&Close',
@@ -276,12 +276,12 @@ export default class MenuBuilder {
     return templateDefault;
   }
 
-  private async doFileOpen() {
+  private async doOpenWorkspace() {
     const { filePaths, canceled } = await dialog.showOpenDialog({ properties: ['openDirectory'] });
     if (!canceled && filePaths.length > 0) {
       const [filePath] = filePaths;
-      applicationState.rootDirectory = filePath;
-      this.mainWindow.webContents.send('switched-root-directory', filePath);
+      applicationState.workspace = filePath;
+      this.mainWindow.webContents.send('switched-workspace', filePath);
     }
   }
 }
