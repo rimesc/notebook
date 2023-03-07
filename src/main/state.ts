@@ -1,7 +1,10 @@
 import path from 'path';
 
 class State {
-  private _rootDirectory: string = path.join(process.env.HOME!, 'Notes');
+  private _rootDirectory: string = path.join(
+    process.env.HOME!,
+    process.env.NODE_ENV === 'production' ? 'Notes' : 'Notes (Testing)'
+  );
 
   get rootDirectory(): string {
     return this._rootDirectory;
