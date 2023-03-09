@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify';
 import furigana from 'furigana-markdown-it';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
+import container from 'markdown-it-container';
 import deflist from 'markdown-it-deflist';
 import footnote from 'markdown-it-footnote';
 import './NoteDisplay.css';
@@ -27,6 +28,8 @@ const md = new MarkdownIt({
 })
   .use(deflist)
   .use(footnote)
+  .use(container, 'info')
+  .use(container, 'warning')
   .use(furigana({}));
 
 /**

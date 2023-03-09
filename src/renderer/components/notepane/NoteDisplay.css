@@ -82,3 +82,19 @@ hr {
   border: 0;
   border-top: 1px solid rgb(208, 215, 222);
 }
+
+.warning, .info {
+  display: flow-root; /* prevents margins on child elements collapsing with those on siblings of the parent */
+  margin: 1em 0;
+  padding: 0 1em;
+}
+
+.warning {
+  border-left: 0.33em solid #ffb300;
+  background-color: #fff8e1;
+}
+
+.info {
+  border-left: 0.33em solid #1e88e5;
+  background-color: rgb(246, 251, 254);
+}
