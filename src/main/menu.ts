@@ -1,4 +1,5 @@
-import { app, BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import { app, BrowserWindow, dialog, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import applicationState from './state';
 
 interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -69,6 +70,16 @@ export default class MenuBuilder {
           click: () => {
             app.quit();
           },
+        },
+      ],
+    };
+    const subMenuFile: DarwinMenuItemConstructorOptions = {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Open Workspace...',
+          accelerator: 'Command+O',
+          click: () => this.doOpenWorkspace(),
         },
       ],
     };
@@ -172,7 +183,7 @@ export default class MenuBuilder {
     const subMenuView =
       process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
@@ -181,8 +192,9 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
+            label: '&Open Workspace...',
             accelerator: 'Ctrl+O',
+            onclick: () => this.doOpenWorkspace(),
           },
           {
             label: '&Close',
@@ -262,5 +274,14 @@ export default class MenuBuilder {
     ];
 
     return templateDefault;
+  }
+
+  private async doOpenWorkspace() {
+    const { filePaths, canceled } = await dialog.showOpenDialog({ properties: ['openDirectory'] });
+    if (!canceled && filePaths.length > 0) {
+      const [filePath] = filePaths;
+      applicationState.workspace = filePath;
+      this.mainWindow.webContents.send('switched-workspace', filePath);
+    }
   }
 }
