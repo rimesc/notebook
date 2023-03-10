@@ -30,6 +30,7 @@ const md = new MarkdownIt({
   .use(footnote)
   .use(container, 'info')
   .use(container, 'warning')
+  .use(container, 'card')
   .use(furigana({}));
 
 /**

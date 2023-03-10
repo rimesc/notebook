@@ -98,3 +98,53 @@ hr {
   border-left: 0.33em solid #1e88e5;
   background-color: rgb(246, 251, 254);
 }
+
+.card {
+  display: inline-block;
+  width: calc(100% - 3em - 2px);
+  margin: 1em;
+  padding: 0.5em;
+  border: 1px solid rgb(224, 224, 224);
+  border-radius: 0.5em;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+  vertical-align: top;
+  color: rgb(0, 0, 0, 0.5);
+  text-align: center;
+  overflow: hidden;
+}
+
+@media (min-width: 600px) {
+  .card {
+    width: calc(50% - 3.16em - 2px);
+  }
+}
+
+@media (min-width: 900px) {
+  .card {
+    width: calc(33% - 3.21em - 2px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .card {
+    width: calc(25% - 3.235em - 2px);
+  }
+}
+
+@media (min-width: 1536px) {
+  .card {
+    width: calc(20% - 3.25em - 2px);
+  }
+}
+
+.card h1 {
+  font-size: 1.5em;
+  font-weight: 400;
+  color: rgb(0, 0, 0, 0.87);
+}
+
+.card h2, .card h3, .card h4, .card h5, .card h6 {
+  font-size: 1em;
+  font-weight: 400;
+  color: rgb(0, 0, 0, 0.87);
+}
