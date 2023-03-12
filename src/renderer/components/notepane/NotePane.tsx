@@ -1,21 +1,22 @@
-import { Box, styled } from '@mui/material';
-import React, { useRef } from 'react';
-import { NoteKey } from '../../model';
-import AppToolbar from '../toolbar/Toolbar';
+import { useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { Mode, NoteKey } from '../../model';
 import NoteDisplay from './NoteDisplay';
 import NoteEditor from './NoteEditor';
 
 interface Props {
   note: NoteKey | undefined;
+  mode: Mode | undefined;
 }
-const NotePane = ({ note }: Props) => {
-  const [content, setContent] = React.useState<string | undefined>(undefined);
-  const [modified, setModified] = React.useState<boolean>(false);
-  const [mode, setMode] = React.useState<'edit' | 'view'>('view');
 
-  React.useEffect(() => {
-    setContent(undefined);
-    setModified(false);
+const NotePane = ({ note, mode }: Props) => {
+  const [content, setContent] = useState<string | undefined>(undefined);
+
+  const doSave = useDebouncedCallback((noteToSave: NoteKey, newContent: string) => {
+    window.electron.saveNote(noteToSave.folder, noteToSave.note, newContent);
+  }, 1000);
+
+  useEffect(() => {
     if (note) {
       const fetchNote = async () => {
         const markdown = await window.electron.fetchNote(note.folder, note.note);
@@ -24,45 +25,31 @@ const NotePane = ({ note }: Props) => {
       };
       fetchNote();
     }
-  }, [note]);
-
-  const handleModeChange = (newMode: 'edit' | 'view') => {
-    setMode(newMode);
-    if (modified) {
-      if (note && content) {
-        const saveNote = async () => {
-          await window.electron.saveNote(note.folder, note.note, content);
-          setModified(false);
-        };
-        saveNote();
-      }
-    }
-  };
+    return () => {
+      doSave.flush();
+      setContent(undefined);
+    };
+  }, [note, doSave]);
 
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    setModified(true);
+    if (note && newContent) {
+      doSave(note, newContent);
+    }
   };
 
-  const offsetRef = useRef<HTMLDivElement>(null);
-  const Offset = styled('div')(({ theme: t }) => t.mixins.toolbar);
-
-  return (
-    <>
-      <AppToolbar mode={note && mode} onModeChange={handleModeChange} />
-      <Offset ref={offsetRef} />
-      <Box
-        component="main"
-        sx={{ height: offsetRef.current ? `calc(100% - ${offsetRef.current.clientHeight}px)` : '100%' }}
-      >
-        {mode === 'view' ? (
-          <NoteDisplay markdown={content} />
-        ) : (
-          <NoteEditor markdown={content} onChange={handleContentChange} />
-        )}
-      </Box>
-    </>
-  );
+  if (note) {
+    switch (mode) {
+      case 'view':
+        return <NoteDisplay markdown={content} />;
+      case 'edit':
+        return <NoteEditor markdown={content} onChange={handleContentChange} />;
+      default:
+        return <></>;
+    }
+  } else {
+    return <></>;
+  }
 };
 
 export default NotePane;

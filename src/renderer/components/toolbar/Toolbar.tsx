@@ -1,9 +1,8 @@
 import ArticleIcon from '@mui/icons-material/Article';
 import EditIcon from '@mui/icons-material/Edit';
 import { AppBar, ToggleButton, ToggleButtonGroup, Toolbar, useTheme } from '@mui/material';
+import { Mode } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
-
-type Mode = 'view' | 'edit';
 
 interface Props {
   mode: Mode | undefined;

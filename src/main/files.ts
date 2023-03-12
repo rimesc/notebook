@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import fs from 'fs';
 import path from 'path';
 import applicationState from './state';
@@ -91,5 +92,6 @@ export async function fetchNote(folder: string, file: string): Promise<string> {
  * @param content contents of the note.
  */
 export async function saveNote(folder: string, file: string, content: string): Promise<void> {
+  log.debug(`Saving <${folder}/${file}>`);
   return writeFile(path.join(applicationState.workspace, folder, `${file}.md`), content, 'utf-8');
 }
