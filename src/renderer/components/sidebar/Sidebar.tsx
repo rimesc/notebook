@@ -1,5 +1,5 @@
 /* eslint no-console: off */
-import { Box, Drawer, List, ListSubheader } from '@mui/material';
+import { Drawer, List, ListSubheader } from '@mui/material';
 import React, { useEffect } from 'react';
 import { NoteKey } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
@@ -53,46 +53,44 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   };
 
   return (
-    <Box component="nav" sx={{ width: { sm: width }, flexShrink: { sm: 0 } }} aria-label="Folders">
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            width,
-            ...draggable,
-          },
-          '& .MuiListItemIcon-root': {
-            minWidth: 36,
-          },
-        }}
-        open
-      >
-        <div style={{ marginTop: 30, height: 'calc(100% - 30px)', ...notDraggable }}>
-          <List
-            dense
-            subheader={
-              <ListSubheader component="div" id="nested-list-subheader" sx={{ userSelect: 'none' }}>
-                Folders
-              </ListSubheader>
-            }
-          >
-            {folders &&
-              folders.map((folder) => (
-                <SideBarFolder
-                  key={folder}
-                  name={folder}
-                  open={open === folder}
-                  selected={selected && folder === selected.folder ? selected.note : undefined}
-                  onSelect={() => handleFolderClick(folder)}
-                  onSelectNote={(note) => handleNoteClick(folder, note)}
-                />
-              ))}
-          </List>
-        </div>
-      </Drawer>
-    </Box>
+    <Drawer
+      variant="permanent"
+      sx={{
+        display: { xs: 'none', sm: 'block' },
+        '& .MuiDrawer-paper': {
+          boxSizing: 'border-box',
+          width,
+          ...draggable,
+        },
+        '& .MuiListItemIcon-root': {
+          minWidth: 36,
+        },
+      }}
+      open
+    >
+      <div style={{ marginTop: 30, height: 'calc(100% - 30px)', ...notDraggable }}>
+        <List
+          dense
+          subheader={
+            <ListSubheader component="div" id="nested-list-subheader" sx={{ userSelect: 'none' }}>
+              Folders
+            </ListSubheader>
+          }
+        >
+          {folders &&
+            folders.map((folder) => (
+              <SideBarFolder
+                key={folder}
+                name={folder}
+                open={open === folder}
+                selected={selected && folder === selected.folder ? selected.note : undefined}
+                onSelect={() => handleFolderClick(folder)}
+                onSelectNote={(note) => handleNoteClick(folder, note)}
+              />
+            ))}
+        </List>
+      </div>
+    </Drawer>
   );
 };
 

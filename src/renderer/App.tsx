@@ -23,8 +23,12 @@ const MainView = () => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar width={drawerWidth} workspace={workspace} selected={selected} onSelect={setSelected} />
-      <NotePane width={`calc(100% - ${drawerWidth}px)`} note={selected} />
+      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="Folders">
+        <Sidebar width={drawerWidth} workspace={workspace} selected={selected} onSelect={setSelected} />
+      </Box>
+      <Box sx={{ width: `calc(100% - ${drawerWidth}px)`, height: '100vh' }}>
+        <NotePane note={selected} />
+      </Box>
     </Box>
   );
 };
