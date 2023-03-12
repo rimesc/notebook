@@ -6,7 +6,7 @@ import MarkdownIt from 'markdown-it';
 import container from 'markdown-it-container';
 import deflist from 'markdown-it-deflist';
 import footnote from 'markdown-it-footnote';
-import './NoteDisplay.css';
+import './Viewer.css';
 
 interface Props {
   markdown: string | undefined;
@@ -36,7 +36,7 @@ const md = new MarkdownIt({
 /**
  * Displays a formatted note.
  */
-const NoteDisplay = ({ markdown }: Props) => {
+const Viewer = ({ markdown }: Props) => {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
@@ -49,4 +49,4 @@ const NoteDisplay = ({ markdown }: Props) => {
   );
 };
 
-export default NoteDisplay;
+export default Viewer;

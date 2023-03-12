@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { Mode, NoteKey } from '../../model';
-import NoteDisplay from './NoteDisplay';
-import NoteEditor from './NoteEditor';
+import Editor from './Editor';
+import Viewer from './Viewer';
 
 interface Props {
   note: NoteKey | undefined;
   mode: Mode | undefined;
 }
 
-const NotePane = ({ note, mode }: Props) => {
+const NoteDisplay = ({ note, mode }: Props) => {
   const [content, setContent] = useState<string | undefined>(undefined);
 
   const doSave = useDebouncedCallback((noteToSave: NoteKey, newContent: string) => {
@@ -41,9 +41,9 @@ const NotePane = ({ note, mode }: Props) => {
   if (note) {
     switch (mode) {
       case 'view':
-        return <NoteDisplay markdown={content} />;
+        return <Viewer markdown={content} />;
       case 'edit':
-        return <NoteEditor markdown={content} onChange={handleContentChange} />;
+        return <Editor markdown={content} onChange={handleContentChange} />;
       default:
         return <></>;
     }
@@ -52,4 +52,4 @@ const NotePane = ({ note, mode }: Props) => {
   }
 };
 
-export default NotePane;
+export default NoteDisplay;

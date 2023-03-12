@@ -1,5 +1,4 @@
 import { Box, TextField } from '@mui/material';
-import './NoteDisplay.css';
 
 interface Props {
   markdown: string | undefined;
@@ -9,7 +8,7 @@ interface Props {
 /**
  * Allows editing of a note.
  */
-const NoteEditor = ({ markdown, onChange }: Props) => {
+const Editor = ({ markdown, onChange }: Props) => {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
@@ -36,4 +35,4 @@ const NoteEditor = ({ markdown, onChange }: Props) => {
   );
 };
 
-export default NoteEditor;
+export default Editor;

@@ -3,7 +3,7 @@ import { Box, styled } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
-import NotePane from './components/notepane/NotePane';
+import NoteDisplay from './components/note/NoteDisplay';
 import Sidebar from './components/sidebar/Sidebar';
 import AppToolbar from './components/toolbar/Toolbar';
 import { NoteKey } from './model';
@@ -38,7 +38,7 @@ const MainView = () => {
           component="main"
           sx={{ height: offsetRef.current ? `calc(100% - ${offsetRef.current.clientHeight}px)` : '100%' }}
         >
-          <NotePane note={selected} mode={mode} />
+          <NoteDisplay note={selected} mode={mode} />
         </Box>
       </Box>
     </Box>
