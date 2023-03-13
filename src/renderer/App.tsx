@@ -23,6 +23,10 @@ const MainView = () => {
     });
   }, []);
 
+  useEffect(() => {
+    return window.electron.ipcRenderer.on('error', console.log);
+  }, []);
+
   const offsetRef = useRef<HTMLDivElement>(null);
   const Offset = styled('div')(({ theme: t }) => t.mixins.toolbar);
 

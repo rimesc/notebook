@@ -19,31 +19,18 @@ interface Props {
 const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   const [folders, setFolders] = React.useState<string[] | undefined>(undefined);
   const [open, setOpen] = React.useState<string | undefined>(undefined);
-  const [files, dispatch] = React.useReducer(
-    (f: { [folder: string]: string[] }, action: { folder: string; files: string[] }) => {
-      const newState = { ...f };
-      newState[action.folder] = action.files;
-      return newState;
-    },
-    {}
-  );
 
   useEffect(() => {
     setFolders([]);
     window.electron.listFolders().then(setFolders).catch(console.log);
   }, [workspace]);
 
-  useEffect(() => {
-    if (open && !(open in files)) {
-      window.electron
-        .listNotes(open)
-        .then((f) => dispatch({ folder: open, files: f }))
-        .catch(console.log);
-    }
-  }, [files, open]);
-
   const handleFolderClick = (folder: string) => {
     setOpen(open !== folder ? folder : undefined);
+  };
+
+  const handleFolderMenu = (folder: string) => {
+    window.electron.showFolderMenu(folder);
   };
 
   const handleNoteClick = (folder: string, note: string) => {
@@ -86,6 +73,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
                 selected={selected && folder === selected.folder ? selected.note : undefined}
                 onSelect={() => handleFolderClick(folder)}
                 onSelectNote={(note) => handleNoteClick(folder, note)}
+                onFolderContextMenu={() => handleFolderMenu(folder)}
               />
             ))}
         </List>

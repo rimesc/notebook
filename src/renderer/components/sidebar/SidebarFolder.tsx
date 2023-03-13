@@ -1,7 +1,7 @@
 /* eslint no-console: off */
 import { ExpandLess, ExpandMore, Folder } from '@mui/icons-material';
 import { Collapse, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import React, { Fragment } from 'react';
+import React, { Fragment, MouseEvent, useEffect } from 'react';
 import SideBarNote from './SidebarNote';
 
 interface Props {
@@ -10,19 +10,31 @@ interface Props {
   selected: string | undefined;
   onSelect: () => void;
   onSelectNote: (note: string) => void;
+  onFolderContextMenu: () => void;
 }
 
 /**
  * Displays a folder with a collapsible list of notes for the sidebar.
  */
-const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote }: Props) => {
+const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote, onFolderContextMenu }: Props) => {
   const [files, setFiles] = React.useState<string[] | undefined>(undefined);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && !files) {
       window.electron.listNotes(name).then(setFiles).catch(console.log);
     }
   }, [files, name, open]);
+
+  useEffect(() => {
+    return window.electron.ipcRenderer.on('created-note', (folder) => {
+      if (folder === name && open) {
+        window.electron
+          .listNotes(folder as string)
+          .then(setFiles)
+          .catch(console.log);
+      }
+    });
+  });
 
   const handleFolderClick = () => {
     onSelect();
@@ -34,10 +46,18 @@ const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote }: Props) 
     }
   };
 
+  const handleFolderAuxClick = (e: MouseEvent<HTMLDivElement> | undefined) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    onFolderContextMenu();
+  };
+
   return (
     <Fragment key={name}>
       <ListItem key={name} disablePadding>
-        <ListItemButton onClick={handleFolderClick}>
+        <ListItemButton onClick={handleFolderClick} onAuxClick={handleFolderAuxClick}>
           <ListItemIcon>
             <Folder />
           </ListItemIcon>

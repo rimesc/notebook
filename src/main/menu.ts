@@ -1,10 +1,26 @@
 import { app, BrowserWindow, dialog, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import { createNote } from './files';
 import applicationState from './state';
 
-interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
+export interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
+
+export const folderMenu = (mainWindow: BrowserWindow, folder: string) =>
+  Menu.buildFromTemplate([
+    {
+      label: 'New Note...',
+      click: async () => {
+        try {
+          await createNote(folder, 'New note');
+          mainWindow.webContents.send('created-note', folder, 'New note');
+        } catch (err) {
+          mainWindow.webContents.send('error', err);
+        }
+      },
+    },
+  ]);
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -14,31 +30,12 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
-      this.setupDevelopmentEnvironment();
-    }
-
     const template = process.platform === 'darwin' ? this.buildDarwinTemplate() : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
 
     return menu;
-  }
-
-  setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
-
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
-          },
-        },
-      ]).popup({ window: this.mainWindow });
-    });
   }
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {

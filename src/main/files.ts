@@ -56,6 +56,13 @@ async function writeFile(file: string, content: string, encoding: BufferEncoding
   });
 }
 
+async function createFile(file: string): Promise<void> {
+  if (fs.existsSync(file)) {
+    throw new Error('File already exists');
+  }
+  return writeFile(file, '', 'utf-8');
+}
+
 /**
  * Lists the top-level folders.
  * @returns list of folder names.
@@ -94,4 +101,15 @@ export async function fetchNote(folder: string, file: string): Promise<string> {
 export async function saveNote(folder: string, file: string, content: string): Promise<void> {
   log.debug(`Saving <${folder}/${file}>`);
   return writeFile(path.join(applicationState.workspace, folder, `${file}.md`), content, 'utf-8');
+}
+
+/**
+ * Creates a new note.
+ * @param folder name of an existing folder to contain the note.
+ * @param file name of the new note.
+ * @throws if a note with the given name already exists in the same folder
+ */
+export async function createNote(folder: string, file: string): Promise<void> {
+  log.debug(`Attempting to create <${folder}/${file}>`);
+  return createFile(path.join(applicationState.workspace, folder, `${file}.md`));
 }
