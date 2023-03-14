@@ -1,18 +1,24 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'list-folders' | 'list-notes' | 'switched-workspace' | 'created-note' | 'error';
+export type Channels =
+  | 'list-folders'
+  | 'list-notes'
+  | 'switched-workspace'
+  | 'created-note'
+  | 'dialogs:create-note:init'
+  | 'dialogs:create-note:done'
+  | 'error';
 
 contextBridge.exposeInMainWorld('electron', {
   getWorkspace: () => ipcRenderer.invoke('get-workspace') as Promise<string>,
   listFolders: () => ipcRenderer.invoke('list-folders') as Promise<string[]>,
   listNotes: (folder: string) => ipcRenderer.invoke('list-notes', folder) as Promise<string[]>,
   fetchNote: (folder: string, note: string) => ipcRenderer.invoke('fetch-note', folder, note) as Promise<string>,
-  saveNote: (folder: string, note: string, content: string) =>
-    ipcRenderer.invoke('save-note', folder, note, content) as Promise<void>,
-  showFolderMenu: (folder: string) => ipcRenderer.invoke('show-folder-menu', folder) as Promise<void>,
+  saveNote: (folder: string, note: string, content: string) => ipcRenderer.send('save-note', folder, note, content),
+  showFolderMenu: (folder: string) => ipcRenderer.send('show-folder-menu', folder),
   ipcRenderer: {
-    sendMessage(channel: Channels, args: unknown[]) {
-      ipcRenderer.send(channel, args);
+    sendMessage(channel: Channels, ...args: unknown[]) {
+      ipcRenderer.send(channel, ...args);
     },
     on(channel: Channels, func: (...args: unknown[]) => void) {
       const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);

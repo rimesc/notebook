@@ -58,7 +58,7 @@ async function writeFile(file: string, content: string, encoding: BufferEncoding
 
 async function createFile(file: string): Promise<void> {
   if (fs.existsSync(file)) {
-    throw new Error('File already exists');
+    throw new Error(`File '${file}' already exists`);
   }
   return writeFile(file, '', 'utf-8');
 }
