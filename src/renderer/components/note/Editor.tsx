@@ -12,7 +12,7 @@ const Editor = ({ markdown, onChange }: Props) => {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
-        {markdown ? (
+        {markdown !== undefined ? (
           <TextField
             multiline
             fullWidth

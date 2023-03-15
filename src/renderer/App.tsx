@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 import { Box, styled } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import CreateNote from './components/dialogs/CreateNote';
 import NoteDisplay from './components/note/NoteDisplay';
 import Sidebar from './components/sidebar/Sidebar';
 import AppToolbar from './components/toolbar/Toolbar';
@@ -51,10 +52,11 @@ const MainView = () => {
 
 export default function App() {
   return (
-    <Router>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<MainView />} />
+        <Route path="/new_note" element={<CreateNote />} />
       </Routes>
-    </Router>
+    </HashRouter>
   );
 }

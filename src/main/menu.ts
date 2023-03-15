@@ -1,23 +1,41 @@
-import { app, BrowserWindow, dialog, Menu, MenuItemConstructorOptions, shell } from 'electron';
-import { createNote } from './files';
+import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import path from 'path';
 import applicationState from './state';
+import { resolveHtmlPath } from './util';
 
 export interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
   submenu?: DarwinMenuItemConstructorOptions[] | Menu;
 }
 
-export const folderMenu = (mainWindow: BrowserWindow, folder: string) =>
+export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
   Menu.buildFromTemplate([
     {
       label: 'New Note...',
       click: async () => {
-        try {
-          await createNote(folder, 'New note');
-          mainWindow.webContents.send('created-note', folder, 'New note');
-        } catch (err) {
-          mainWindow.webContents.send('error', err);
-        }
+        const modal = new BrowserWindow({
+          parent: mainWindow,
+          modal: true,
+          titleBarStyle: 'hidden',
+          show: false,
+          width: 480,
+          height: 128,
+          resizable: false,
+          webPreferences: {
+            preload: app.isPackaged
+              ? path.join(__dirname, 'preload.js')
+              : path.join(__dirname, '../../.erb/dll/preload.js'),
+            devTools: false,
+          },
+        });
+        modal.loadURL(resolveHtmlPath('index.html', '/new_note'));
+        modal.on('ready-to-show', () => {
+          modal.webContents.send('dialogs:create-note:init', folder);
+          ipcMain.once('dialogs:create-note:done', () => {
+            modal.close();
+          });
+          modal.show();
+        });
       },
     },
   ]);
