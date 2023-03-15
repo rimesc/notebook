@@ -56,11 +56,11 @@ async function writeFile(file: string, content: string, encoding: BufferEncoding
   });
 }
 
-async function createFile(file: string): Promise<void> {
+async function createFile(file: string, content = ''): Promise<void> {
   if (fs.existsSync(file)) {
     throw new Error(`File '${file}' already exists`);
   }
-  return writeFile(file, '', 'utf-8');
+  return writeFile(file, content, 'utf-8');
 }
 
 /**
@@ -111,5 +111,5 @@ export async function saveNote(folder: string, file: string, content: string): P
  */
 export async function createNote(folder: string, file: string): Promise<void> {
   log.debug(`Attempting to create <${folder}/${file}>`);
-  return createFile(path.join(applicationState.workspace, folder, `${file}.md`));
+  return createFile(path.join(applicationState.workspace, folder, `${file}.md`), `# ${file}\n\n`);
 }

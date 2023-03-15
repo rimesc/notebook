@@ -26,11 +26,17 @@ const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote, onFolderC
   }, [files, name, open]);
 
   useEffect(() => {
-    return window.electron.ipcRenderer.on('created-note', (folder) => {
+    return window.electron.ipcRenderer.on('created-note', (folder, note) => {
       if (folder === name) {
         window.electron
           .listNotes(folder as string)
           .then(setFiles)
+          .then(() => {
+            if (!open) {
+              onSelect();
+            }
+            return onSelectNote(note as string);
+          })
           .catch(console.log);
       }
     });
