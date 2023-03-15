@@ -9,7 +9,7 @@ export type Channels =
   | 'dialogs:create-note:done'
   | 'error';
 
-contextBridge.exposeInMainWorld('electron', {
+const electronHandler = {
   getWorkspace: () => ipcRenderer.invoke('get-workspace') as Promise<string>,
   listFolders: () => ipcRenderer.invoke('list-folders') as Promise<string[]>,
   listNotes: (folder: string) => ipcRenderer.invoke('list-notes', folder) as Promise<string[]>,
@@ -32,4 +32,8 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
-});
+};
+
+contextBridge.exposeInMainWorld('electron', electronHandler);
+
+export type ElectronHandler = typeof electronHandler;
