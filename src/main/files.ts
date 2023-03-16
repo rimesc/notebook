@@ -63,6 +63,13 @@ async function createFile(file: string, content = ''): Promise<void> {
   return writeFile(file, content, 'utf-8');
 }
 
+async function createDirectory(folder: string): Promise<void> {
+  if (fs.existsSync(folder)) {
+    throw new Error(`Folder '${folder}' already exists`);
+  }
+  return fs.mkdirSync(folder);
+}
+
 /**
  * Lists the top-level folders.
  * @returns list of folder names.
@@ -112,4 +119,14 @@ export async function saveNote(folder: string, file: string, content: string): P
 export async function createNote(folder: string, file: string): Promise<void> {
   log.debug(`Attempting to create <${folder}/${file}>`);
   return createFile(path.join(applicationState.workspace, folder, `${file}.md`), `# ${file}\n\n`);
+}
+
+/**
+ * Creates a new folder.
+ * @param folder name of the new folder.
+ * @throws if a folder with the given name already exists in the workspace
+ */
+export async function createFolder(folder: string): Promise<void> {
+  log.debug(`Attempting to create <${folder}>`);
+  return createDirectory(path.join(applicationState.workspace, folder));
 }

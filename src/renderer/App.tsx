@@ -3,6 +3,7 @@ import { Box, styled } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import CreateFolder from './components/dialogs/CreateFolder';
 import CreateNote from './components/dialogs/CreateNote';
 import NoteDisplay from './components/note/NoteDisplay';
 import Sidebar from './components/sidebar/Sidebar';
@@ -56,6 +57,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<MainView />} />
         <Route path="/new_note" element={<CreateNote />} />
+        <Route path="/new_folder" element={<CreateFolder />} />
       </Routes>
     </HashRouter>
   );
