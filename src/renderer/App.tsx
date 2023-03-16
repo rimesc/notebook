@@ -56,8 +56,8 @@ export default function App() {
     <HashRouter>
       <Routes>
         <Route path="/" element={<MainView />} />
-        <Route path="/new_note" element={<CreateNote />} />
-        <Route path="/new_folder" element={<CreateFolder />} />
+        <Route path="/create-note" element={<CreateNote />} />
+        <Route path="/create-folder" element={<CreateFolder />} />
       </Routes>
     </HashRouter>
   );

@@ -1,7 +1,6 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItemConstructorOptions, shell } from 'electron';
-import path from 'path';
+import { app, BrowserWindow, dialog, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import showDialog from './dialogs';
 import applicationState from './state';
-import { resolveHtmlPath } from './util';
 
 export interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
   selector?: string;
@@ -12,31 +11,7 @@ export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
   Menu.buildFromTemplate([
     {
       label: 'New Note...',
-      click: async () => {
-        const modal = new BrowserWindow({
-          parent: mainWindow,
-          modal: true,
-          titleBarStyle: 'hidden',
-          show: false,
-          width: 480,
-          height: 128,
-          resizable: false,
-          webPreferences: {
-            preload: app.isPackaged
-              ? path.join(__dirname, 'preload.js')
-              : path.join(__dirname, '../../.erb/dll/preload.js'),
-            devTools: false,
-          },
-        });
-        modal.loadURL(resolveHtmlPath('index.html', '/new_note'));
-        modal.on('ready-to-show', () => {
-          modal.webContents.send('dialogs:create-note:init', folder);
-          ipcMain.once('dialogs:create-note:done', () => {
-            modal.close();
-          });
-          modal.show();
-        });
-      },
+      click: async () => showDialog('create-note', { width: 480, height: 128, parent: mainWindow }, folder),
     },
   ]);
 
@@ -320,27 +295,6 @@ export default class MenuBuilder {
   }
 
   private async doCreateFolder() {
-    const modal = new BrowserWindow({
-      parent: this.mainWindow,
-      modal: true,
-      titleBarStyle: 'hidden',
-      show: false,
-      width: 480,
-      height: 128,
-      resizable: false,
-      webPreferences: {
-        preload: app.isPackaged
-          ? path.join(__dirname, 'preload.js')
-          : path.join(__dirname, '../../.erb/dll/preload.js'),
-        devTools: false,
-      },
-    });
-    modal.loadURL(resolveHtmlPath('index.html', '/new_folder'));
-    modal.on('ready-to-show', () => {
-      ipcMain.once('dialogs:create-folder:done', () => {
-        modal.close();
-      });
-      modal.show();
-    });
+    showDialog('create-folder', { width: 480, height: 128, parent: this.mainWindow });
   }
 }
