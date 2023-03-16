@@ -4,9 +4,11 @@ export type Channels =
   | 'list-folders'
   | 'list-notes'
   | 'switched-workspace'
+  | 'created-folder'
   | 'created-note'
   | 'dialogs:create-note:init'
   | 'dialogs:create-note:done'
+  | 'dialogs:create-folder:done'
   | 'error';
 
 const electronHandler = {

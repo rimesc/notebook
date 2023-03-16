@@ -96,6 +96,14 @@ export default class MenuBuilder {
           accelerator: 'Command+O',
           click: () => this.doOpenWorkspace(),
         },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'New Folder...',
+          accelerator: 'Command+Shift+N',
+          click: () => this.doCreateFolder(),
+        },
       ],
     };
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
@@ -201,15 +209,26 @@ export default class MenuBuilder {
     return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
-  buildDefaultTemplate() {
-    const templateDefault = [
+  buildDefaultTemplate(): MenuItemConstructorOptions[] {
+    const templateDefault: MenuItemConstructorOptions[] = [
       {
         label: '&File',
         submenu: [
           {
             label: '&Open Workspace...',
             accelerator: 'Ctrl+O',
-            onclick: () => this.doOpenWorkspace(),
+            click: () => this.doOpenWorkspace(),
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: 'New &Folder...',
+            accelerator: 'Ctrl+Shift+N',
+            click: () => this.doCreateFolder(),
+          },
+          {
+            type: 'separator',
           },
           {
             label: '&Close',
@@ -298,5 +317,30 @@ export default class MenuBuilder {
       applicationState.workspace = filePath;
       this.mainWindow.webContents.send('switched-workspace', filePath);
     }
+  }
+
+  private async doCreateFolder() {
+    const modal = new BrowserWindow({
+      parent: this.mainWindow,
+      modal: true,
+      titleBarStyle: 'hidden',
+      show: false,
+      width: 480,
+      height: 128,
+      resizable: false,
+      webPreferences: {
+        preload: app.isPackaged
+          ? path.join(__dirname, 'preload.js')
+          : path.join(__dirname, '../../.erb/dll/preload.js'),
+        devTools: false,
+      },
+    });
+    modal.loadURL(resolveHtmlPath('index.html', '/new_folder'));
+    modal.on('ready-to-show', () => {
+      ipcMain.once('dialogs:create-folder:done', () => {
+        modal.close();
+      });
+      modal.show();
+    });
   }
 }
