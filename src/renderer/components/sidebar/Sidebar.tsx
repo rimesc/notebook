@@ -35,6 +35,20 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
     });
   });
 
+  useEffect(() => {
+    return window.electron.onMenuCommandNewNote((folder) => {
+      // If the command is triggered from the main menu, target the currently open folder (if any).
+      const targetFolder = folder ?? open;
+      if (targetFolder) {
+        window.electron.showDialog('create-note', targetFolder);
+      }
+    });
+  });
+
+  useEffect(() => {
+    return window.electron.onMenuCommandNewFolder(() => window.electron.showDialog('create-folder'));
+  });
+
   const handleFolderClick = (folder: string) => {
     setOpen(open !== folder ? folder : undefined);
   };

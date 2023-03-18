@@ -12,6 +12,7 @@ import { app, BrowserWindow, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
+import showDialog from './dialogs';
 import { createFolder, createNote, fetchNote, listFolders, listNotes, saveNote } from './files';
 import MenuBuilder, { folderMenu } from './menu';
 import applicationState from './state';
@@ -32,7 +33,7 @@ ipcMain.handle('list-folders', listFolders);
 ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
 ipcMain.handle('fetch-note', (_, folder, note) => fetchNote(folder, note));
 ipcMain.on('save-note', (_, folder, note, content) => saveNote(folder, note, content));
-ipcMain.on('dialogs:create-note:done', async (_, folder, note) => {
+ipcMain.on('create-note', async (_, folder, note) => {
   if (folder && note) {
     await createNote(folder, note);
     if (mainWindow) {
@@ -40,7 +41,7 @@ ipcMain.on('dialogs:create-note:done', async (_, folder, note) => {
     }
   }
 });
-ipcMain.on('dialogs:create-folder:done', async (_, folder) => {
+ipcMain.on('create-folder', async (_, folder) => {
   if (folder) {
     await createFolder(folder);
     if (mainWindow) {
@@ -51,6 +52,11 @@ ipcMain.on('dialogs:create-folder:done', async (_, folder) => {
 ipcMain.on('show-folder-menu', (_, folder) => {
   if (mainWindow) {
     folderMenu(folder, mainWindow).popup({ window: mainWindow });
+  }
+});
+ipcMain.on('show-dialog', (_, dialog, ...args) => {
+  if (mainWindow) {
+    showDialog(dialog, { width: 480, height: 128, parent: mainWindow }, ...args);
   }
 });
 

@@ -3,12 +3,18 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 export type Channels =
   | 'list-folders'
   | 'list-notes'
+  | 'save-note'
+  | 'create-folder'
+  | 'create-note'
+  | 'show-folder-menu'
   | 'switched-workspace'
   | 'created-folder'
   | 'created-note'
-  | 'dialogs:create-note:init'
-  | 'dialogs:create-note:done'
-  | 'dialogs:create-folder:done';
+  | 'show-dialog'
+  | 'init-dialog'
+  | 'close-dialog'
+  | 'menu-command:new-note'
+  | 'menu-command:new-folder';
 
 function on(channel: Channels, func: (...args: unknown[]) => void): () => void {
   const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
@@ -19,27 +25,34 @@ function on(channel: Channels, func: (...args: unknown[]) => void): () => void {
   };
 }
 
+function sendMessage(channel: Channels, ...args: unknown[]) {
+  ipcRenderer.send(channel, ...args);
+}
+
 const electronHandler = {
   getWorkspace: () => ipcRenderer.invoke('get-workspace') as Promise<string>,
   listFolders: () => ipcRenderer.invoke('list-folders') as Promise<string[]>,
   listNotes: (folder: string) => ipcRenderer.invoke('list-notes', folder) as Promise<string[]>,
   fetchNote: (folder: string, note: string) => ipcRenderer.invoke('fetch-note', folder, note) as Promise<string>,
 
-  saveNote: (folder: string, note: string, content: string) => ipcRenderer.send('save-note', folder, note, content),
-  showFolderMenu: (folder: string) => ipcRenderer.send('show-folder-menu', folder),
+  createFolder: (folder: string) => sendMessage('create-folder', folder),
+  createNote: (folder: string, note: string) => sendMessage('create-note', folder, note),
+  saveNote: (folder: string, note: string, content: string) => sendMessage('save-note', folder, note, content),
+  showFolderMenu: (folder: string) => sendMessage('show-folder-menu', folder),
+  showDialog: (id: string, ...args: unknown[]) => sendMessage('show-dialog', id, ...args),
+  closeDialog: () => sendMessage('close-dialog'),
 
   onSwitchedWorkspace: (func: (workspace: string) => void) =>
     on('switched-workspace', (workspace) => func(workspace as string)),
   onCreatedFolder: (func: (folder: string) => void) => on('created-folder', (folder) => func(folder as string)),
   onCreatedNote: (func: (folder: string, note: string) => void) =>
     on('created-note', (folder, note) => func(folder as string, note as string)),
-  onInitCreateNoteDialog: (func: (folder: string) => void) =>
-    on('dialogs:create-note:init', (folder) => func(folder as string)),
+  onInitCreateNoteDialog: (func: (folder: string) => void) => on('init-dialog', (folder) => func(folder as string)),
+  onMenuCommandNewNote: (func: (folder: string) => void) =>
+    on('menu-command:new-note', (folder) => func(folder as string)),
+  onMenuCommandNewFolder: (func: () => void) => on('menu-command:new-folder', () => func()),
 
   ipcRenderer: {
-    sendMessage(channel: Channels, ...args: unknown[]) {
-      ipcRenderer.send(channel, ...args);
-    },
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },

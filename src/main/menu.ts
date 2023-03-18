@@ -1,5 +1,4 @@
 import { app, BrowserWindow, dialog, Menu, MenuItemConstructorOptions, shell } from 'electron';
-import showDialog from './dialogs';
 import applicationState from './state';
 
 export interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOptions {
@@ -11,7 +10,7 @@ export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
   Menu.buildFromTemplate([
     {
       label: 'New Note...',
-      click: async () => showDialog('create-note', { width: 480, height: 128, parent: mainWindow }, folder),
+      click: async () => mainWindow.webContents.send('menu-command:new-note', folder),
     },
   ]);
 
@@ -295,6 +294,6 @@ export default class MenuBuilder {
   }
 
   private async doCreateFolder() {
-    showDialog('create-folder', { width: 480, height: 128, parent: this.mainWindow });
+    this.mainWindow.webContents.send('menu-command:new-folder');
   }
 }

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain } from 'electron';
+import { app, BrowserWindow, BrowserWindowConstructorOptions, ipcMain, IpcMainEvent } from 'electron';
 import path from 'path';
 import { resolveHtmlPath } from './util';
 
@@ -23,8 +23,14 @@ function show(id: string, options: Options, ...args: unknown[]): void {
   const modal = new BrowserWindow({ ...commonWindowOptions, ...options });
   modal.loadURL(resolveHtmlPath('index.html', `/${id}`));
   modal.on('ready-to-show', () => {
-    modal.webContents.send(`dialogs:${id}:init`, ...args);
-    ipcMain.once(`dialogs:${id}:done`, () => modal.close());
+    modal.webContents.send(`init-dialog`, ...args);
+    const closeDialog = ({ sender }: IpcMainEvent) => {
+      if (sender === modal.webContents) {
+        modal.close();
+      }
+    };
+    modal.on('close', () => ipcMain.removeListener(`close-dialog`, closeDialog));
+    ipcMain.on(`close-dialog`, closeDialog);
     modal.show();
   });
 }
