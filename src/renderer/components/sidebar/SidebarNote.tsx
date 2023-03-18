@@ -13,7 +13,7 @@ interface Props {
 /**
  * Displays a note for the sidebar.
  */
-const SideBarNote = ({ name, selected, onSelect, onContextMenu }: Props) => {
+const SidebarNote = ({ name, selected, onSelect, onContextMenu }: Props) => {
   const handleClick = () => {
     if (!selected) {
       onSelect();
@@ -40,4 +40,4 @@ const SideBarNote = ({ name, selected, onSelect, onContextMenu }: Props) => {
   );
 };
 
-export default SideBarNote;
+export default SidebarNote;

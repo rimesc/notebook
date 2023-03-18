@@ -3,8 +3,8 @@ import { Drawer, List, ListSubheader } from '@mui/material';
 import { useEffect, useReducer, useState } from 'react';
 import { NoteKey } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
-import SideBarFolder from './SidebarFolder';
-import SideBarNote from './SidebarNote';
+import SidebarFolder from './SidebarFolder';
+import SidebarNote from './SidebarNote';
 
 interface Props {
   /** Width of the sidebar, in pixels */
@@ -145,7 +145,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
           {folders &&
             folders.map((folder) => {
               return (
-                <SideBarFolder
+                <SidebarFolder
                   key={folder}
                   name={folder}
                   open={open === folder}
@@ -153,7 +153,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
                   onContextMenu={() => handleFolderMenu(folder)}
                 >
                   {notes[folder]?.map((note) => (
-                    <SideBarNote
+                    <SidebarNote
                       key={note}
                       name={note}
                       selected={note === selected?.note}
@@ -161,7 +161,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
                       onContextMenu={() => handleNoteMenu(folder, note)}
                     />
                   ))}
-                </SideBarFolder>
+                </SidebarFolder>
               );
             })}
         </List>
