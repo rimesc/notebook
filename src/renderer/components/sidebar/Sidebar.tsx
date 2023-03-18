@@ -63,6 +63,10 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
     }
   };
 
+  const handleNoteMenu = (folder: string, note: string) => {
+    window.electron.showNoteMenu(folder, note);
+  };
+
   return (
     <Drawer
       variant="permanent"
@@ -98,6 +102,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
                 onSelect={() => handleFolderClick(folder)}
                 onSelectNote={(note) => handleNoteClick(folder, note)}
                 onFolderContextMenu={() => handleFolderMenu(folder)}
+                onNoteContextMenu={(note) => handleNoteMenu(folder, note)}
               />
             ))}
         </List>

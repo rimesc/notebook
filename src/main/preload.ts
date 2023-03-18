@@ -7,6 +7,7 @@ export type Channels =
   | 'create-folder'
   | 'create-note'
   | 'show-folder-menu'
+  | 'show-note-menu'
   | 'switched-workspace'
   | 'created-folder'
   | 'created-note'
@@ -39,6 +40,7 @@ const electronHandler = {
   createNote: (folder: string, note: string) => sendMessage('create-note', folder, note),
   saveNote: (folder: string, note: string, content: string) => sendMessage('save-note', folder, note, content),
   showFolderMenu: (folder: string) => sendMessage('show-folder-menu', folder),
+  showNoteMenu: (folder: string, note: string) => sendMessage('show-note-menu', folder, note),
   showDialog: (id: string, ...args: unknown[]) => sendMessage('show-dialog', id, ...args),
   closeDialog: () => sendMessage('close-dialog'),
 

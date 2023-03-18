@@ -11,12 +11,21 @@ interface Props {
   onSelect: () => void;
   onSelectNote: (note: string) => void;
   onFolderContextMenu: () => void;
+  onNoteContextMenu: (note: string) => void;
 }
 
 /**
  * Displays a folder with a collapsible list of notes for the sidebar.
  */
-const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote, onFolderContextMenu }: Props) => {
+const SideBarFolder = ({
+  name,
+  open,
+  selected,
+  onSelect,
+  onSelectNote,
+  onFolderContextMenu,
+  onNoteContextMenu,
+}: Props) => {
   const [files, setFiles] = React.useState<string[] | undefined>(undefined);
 
   useEffect(() => {
@@ -79,6 +88,7 @@ const SideBarFolder = ({ name, open, selected, onSelect, onSelectNote, onFolderC
               name={text}
               selected={selected !== undefined && text === selected}
               onSelect={() => handleNoteClick(text)}
+              onContextMenu={() => onNoteContextMenu(text)}
             />
           ))}
         </List>
