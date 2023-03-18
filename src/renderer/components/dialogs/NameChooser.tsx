@@ -1,15 +1,18 @@
 import { Box, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   placeholder: string;
+  originalName?: string;
   validate: (name: string) => boolean | undefined;
   onSubmit: (name: string) => void;
   onCancel: () => void;
 }
 
-const NameChooser = ({ placeholder, validate, onSubmit, onCancel }: Props) => {
-  const [name, setName] = useState('');
+const NameChooser = ({ placeholder, originalName = '', validate, onSubmit, onCancel }: Props) => {
+  const [name, setName] = useState(originalName);
+
+  useEffect(() => setName(originalName), [originalName]);
 
   // A name can be neither valid nor invalid if, e.g., it is empty. In these cases we don't display an error,
   // but we also don't allow the name to be confirmed.

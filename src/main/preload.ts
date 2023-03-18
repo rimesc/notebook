@@ -6,6 +6,7 @@ export type Channels =
   | 'save-note'
   | 'create-folder'
   | 'create-note'
+  | 'rename-note'
   | 'show-folder-menu'
   | 'show-note-menu'
   | 'switched-workspace'
@@ -15,6 +16,7 @@ export type Channels =
   | 'init-dialog'
   | 'close-dialog'
   | 'menu-command:new-note'
+  | 'menu-command:rename-note'
   | 'menu-command:new-folder';
 
 function on(channel: Channels, func: (...args: unknown[]) => void): () => void {
@@ -38,6 +40,7 @@ const electronHandler = {
 
   createFolder: (folder: string) => sendMessage('create-folder', folder),
   createNote: (folder: string, note: string) => sendMessage('create-note', folder, note),
+  renameNote: (folder: string, note: string) => sendMessage('rename-note', folder, note),
   saveNote: (folder: string, note: string, content: string) => sendMessage('save-note', folder, note, content),
   showFolderMenu: (folder: string) => sendMessage('show-folder-menu', folder),
   showNoteMenu: (folder: string, note: string) => sendMessage('show-note-menu', folder, note),
@@ -50,8 +53,12 @@ const electronHandler = {
   onCreatedNote: (func: (folder: string, note: string) => void) =>
     on('created-note', (folder, note) => func(folder as string, note as string)),
   onInitCreateNoteDialog: (func: (folder: string) => void) => on('init-dialog', (folder) => func(folder as string)),
+  onInitRenameNoteDialog: (func: (folder: string, note: string) => void) =>
+    on('init-dialog', (folder, note) => func(folder as string, note as string)),
   onMenuCommandNewNote: (func: (folder: string) => void) =>
     on('menu-command:new-note', (folder) => func(folder as string)),
+  onMenuCommandRenameNote: (func: (folder: string, note: string) => void) =>
+    on('menu-command:rename-note', (folder, note) => func(folder as string, note as string)),
   onMenuCommandNewFolder: (func: () => void) => on('menu-command:new-folder', () => func()),
 
   ipcRenderer: {

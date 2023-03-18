@@ -46,6 +46,12 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   });
 
   useEffect(() => {
+    return window.electron.onMenuCommandRenameNote((folder, note) =>
+      window.electron.showDialog('rename-note', folder, note)
+    );
+  });
+
+  useEffect(() => {
     return window.electron.onMenuCommandNewFolder(() => window.electron.showDialog('create-folder'));
   });
 
