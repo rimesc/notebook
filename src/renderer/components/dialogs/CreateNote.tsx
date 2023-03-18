@@ -6,9 +6,7 @@ const CreateNote = () => {
   const [files, setFiles] = useState<string[] | undefined>(undefined);
 
   useEffect(() => {
-    return window.electron.ipcRenderer.on('dialogs:create-note:init', (inFolder) => {
-      setFolder(inFolder as string);
-    });
+    return window.electron.onInitCreateNoteDialog(setFolder);
   }, []);
 
   useEffect(() => {

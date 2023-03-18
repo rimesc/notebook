@@ -19,14 +19,10 @@ const MainView = () => {
 
   useEffect(() => {
     window.electron.getWorkspace().then(setWorkspace).catch(console.log);
-    return window.electron.ipcRenderer.on('switched-workspace', (newWorkspace) => {
+    return window.electron.onSwitchedWorkspace((newWorkspace) => {
       setSelected(undefined);
-      setWorkspace(newWorkspace as string);
+      setWorkspace(newWorkspace);
     });
-  }, []);
-
-  useEffect(() => {
-    return window.electron.ipcRenderer.on('error', console.log);
   }, []);
 
   const offsetRef = useRef<HTMLDivElement>(null);

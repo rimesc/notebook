@@ -26,11 +26,11 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   }, [workspace]);
 
   useEffect(() => {
-    return window.electron.ipcRenderer.on('created-folder', (folder) => {
+    return window.electron.onCreatedFolder((folder) => {
       window.electron
         .listFolders()
         .then(setFolders)
-        .then(() => setOpen(folder as string))
+        .then(() => setOpen(folder))
         .catch(console.log);
     });
   });
