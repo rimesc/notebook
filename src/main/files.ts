@@ -21,38 +21,20 @@ function isMarkdown(p: string): boolean {
 
 async function listFiles(dir: string): Promise<string[]> {
   return new Promise<string[]>((resolve, reject) => {
-    fs.readdir(dir, (err, files) => {
-      if (err) {
-        reject(err);
-      } else {
-        // return the full path to the file
-        resolve(files.map((name) => path.join(dir, name)));
-      }
-    });
+    // return the full path to each file
+    fs.readdir(dir, (err, files) => (err ? reject(err) : resolve(files.map((name) => path.join(dir, name)))));
   });
 }
 
 async function readFile(file: string, encoding: BufferEncoding): Promise<string> {
   return new Promise<string>((resolve, reject) => {
-    fs.readFile(file, (err, buffer) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(buffer.toString(encoding));
-      }
-    });
+    fs.readFile(file, (err, buffer) => (err ? reject(err) : resolve(buffer.toString(encoding))));
   });
 }
 
 async function writeFile(file: string, content: string, encoding: BufferEncoding): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    fs.writeFile(file, Buffer.from(content, encoding), (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
+    fs.writeFile(file, Buffer.from(content, encoding), (err) => (err ? reject(err) : resolve()));
   });
 }
 
@@ -61,6 +43,19 @@ async function createFile(file: string, content = ''): Promise<void> {
     throw new Error(`File '${file}' already exists`);
   }
   return writeFile(file, content, 'utf-8');
+}
+
+async function moveFile(from: string, to: string): Promise<void> {
+  if (fs.existsSync(to)) {
+    throw new Error(`File '${to}' already exists`);
+  }
+  const parent = path.dirname(to);
+  if (!fs.existsSync(parent) || !isDirectory(parent)) {
+    throw new Error(`Directory '${parent}' does not exist or is not a directory`);
+  }
+  return new Promise<void>((resolve, reject) => {
+    fs.rename(from, to, (err) => (err ? reject(err) : resolve()));
+  });
 }
 
 async function createDirectory(folder: string): Promise<void> {
@@ -119,6 +114,18 @@ export async function saveNote(folder: string, file: string, content: string): P
 export async function createNote(folder: string, file: string): Promise<void> {
   log.debug(`Attempting to create <${folder}/${file}>`);
   return createFile(path.join(applicationState.workspace, folder, `${file}.md`), `# ${file}\n\n`);
+}
+
+/**
+ * Renames a note.
+ * @param folder name of the folder containing the note.
+ * @param file current name of the note.
+ * @param newFile new name of the note.
+ */
+export async function renameNote(folder: string, file: string, newFile: string): Promise<void> {
+  log.debug(`Attempting to rename <${folder}/${file}> to <${newFile}>`);
+  const parentDirectory = path.join(applicationState.workspace, folder);
+  return moveFile(path.join(parentDirectory, `${file}.md`), path.join(parentDirectory, `${newFile}.md`));
 }
 
 /**

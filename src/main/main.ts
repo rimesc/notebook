@@ -13,8 +13,8 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import showDialog from './dialogs';
-import { createFolder, createNote, fetchNote, listFolders, listNotes, saveNote } from './files';
-import MenuBuilder, { folderMenu } from './menu';
+import { createFolder, createNote, fetchNote, listFolders, listNotes, renameNote, saveNote } from './files';
+import MenuBuilder, { folderMenu, noteMenu } from './menu';
 import applicationState from './state';
 import { resolveHtmlPath } from './util';
 
@@ -41,6 +41,14 @@ ipcMain.on('create-note', async (_, folder, note) => {
     }
   }
 });
+ipcMain.on('rename-note', async (_, folder, note, newName) => {
+  if (folder && note && newName) {
+    await renameNote(folder, note, newName);
+    if (mainWindow) {
+      mainWindow.webContents.send('renamed-note', folder, newName);
+    }
+  }
+});
 ipcMain.on('create-folder', async (_, folder) => {
   if (folder) {
     await createFolder(folder);
@@ -52,6 +60,11 @@ ipcMain.on('create-folder', async (_, folder) => {
 ipcMain.on('show-folder-menu', (_, folder) => {
   if (mainWindow) {
     folderMenu(folder, mainWindow).popup({ window: mainWindow });
+  }
+});
+ipcMain.on('show-note-menu', (_, folder, note) => {
+  if (mainWindow) {
+    noteMenu(folder, note, mainWindow).popup({ window: mainWindow });
   }
 });
 ipcMain.on('show-dialog', (_, dialog, ...args) => {

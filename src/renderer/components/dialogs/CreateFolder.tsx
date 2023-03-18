@@ -12,7 +12,7 @@ const CreateFolder = () => {
   }, []);
 
   const handleSubmit = (name: string) => {
-    window.electron.createFolder(name.trim());
+    window.electron.createFolder(name);
     window.electron.closeDialog();
   };
 
@@ -20,7 +20,7 @@ const CreateFolder = () => {
     <NameChooser
       placeholder="New folder"
       // A name can be invalid but not conflicting if (a) it is empty or (b) the list of existing folders hasn't been fetched yet.
-      validate={(name) => (name && name.trim() && folders ? !folders.includes(name.trim().toLowerCase()) : false)}
+      validate={(name) => (name && name && folders ? !folders.includes(name.toLowerCase()) : false)}
       onSubmit={handleSubmit}
       onCancel={window.electron.closeDialog}
     />

@@ -15,6 +15,14 @@ export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
     },
   ]);
 
+export const noteMenu = (folder: string, note: string, mainWindow: BrowserWindow) =>
+  Menu.buildFromTemplate([
+    {
+      label: '&Rename...',
+      click: async () => mainWindow.webContents.send('menu-command:rename-note', folder, note),
+    },
+  ]);
+
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
 
