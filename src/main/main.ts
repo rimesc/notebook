@@ -13,7 +13,7 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import showDialog from './dialogs';
-import { createFolder, createNote, fetchNote, listFolders, listNotes, saveNote } from './files';
+import { createFolder, createNote, fetchNote, listFolders, listNotes, renameNote, saveNote } from './files';
 import MenuBuilder, { folderMenu, noteMenu } from './menu';
 import applicationState from './state';
 import { resolveHtmlPath } from './util';
@@ -38,6 +38,14 @@ ipcMain.on('create-note', async (_, folder, note) => {
     await createNote(folder, note);
     if (mainWindow) {
       mainWindow.webContents.send('created-note', folder, note);
+    }
+  }
+});
+ipcMain.on('rename-note', async (_, folder, note, newName) => {
+  if (folder && note && newName) {
+    await renameNote(folder, note, newName);
+    if (mainWindow) {
+      mainWindow.webContents.send('renamed-note', folder, newName);
     }
   }
 });

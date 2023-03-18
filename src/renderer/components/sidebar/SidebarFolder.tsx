@@ -51,6 +51,14 @@ const SideBarFolder = ({
     });
   });
 
+  useEffect(() => {
+    return window.electron.onRenamedNote((folder) => {
+      if (folder === name) {
+        window.electron.listNotes(folder).then(setFiles).catch(console.log);
+      }
+    });
+  });
+
   const handleFolderClick = () => {
     onSelect();
   };

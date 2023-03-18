@@ -12,6 +12,7 @@ export type Channels =
   | 'switched-workspace'
   | 'created-folder'
   | 'created-note'
+  | 'renamed-note'
   | 'show-dialog'
   | 'init-dialog'
   | 'close-dialog'
@@ -40,7 +41,8 @@ const electronHandler = {
 
   createFolder: (folder: string) => sendMessage('create-folder', folder),
   createNote: (folder: string, note: string) => sendMessage('create-note', folder, note),
-  renameNote: (folder: string, note: string) => sendMessage('rename-note', folder, note),
+  renameNote: (folder: string, originalName: string, newName: string) =>
+    sendMessage('rename-note', folder, originalName, newName),
   saveNote: (folder: string, note: string, content: string) => sendMessage('save-note', folder, note, content),
   showFolderMenu: (folder: string) => sendMessage('show-folder-menu', folder),
   showNoteMenu: (folder: string, note: string) => sendMessage('show-note-menu', folder, note),
@@ -52,6 +54,8 @@ const electronHandler = {
   onCreatedFolder: (func: (folder: string) => void) => on('created-folder', (folder) => func(folder as string)),
   onCreatedNote: (func: (folder: string, note: string) => void) =>
     on('created-note', (folder, note) => func(folder as string, note as string)),
+  onRenamedNote: (func: (folder: string, note: string) => void) =>
+    on('renamed-note', (folder, note) => func(folder as string, note as string)),
   onInitCreateNoteDialog: (func: (folder: string) => void) => on('init-dialog', (folder) => func(folder as string)),
   onInitRenameNoteDialog: (func: (folder: string, note: string) => void) =>
     on('init-dialog', (folder, note) => func(folder as string, note as string)),

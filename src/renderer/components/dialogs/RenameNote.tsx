@@ -23,8 +23,8 @@ const RenameNote = () => {
   }, [folder]);
 
   const handleSubmit = (name: string) => {
-    if (folder) {
-      window.electron.renameNote(folder, name);
+    if (folder && originalName) {
+      window.electron.renameNote(folder, originalName, name);
       window.electron.closeDialog();
     }
   };
