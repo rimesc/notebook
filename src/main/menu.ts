@@ -9,7 +9,8 @@ export interface DarwinMenuItemConstructorOptions extends MenuItemConstructorOpt
 export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
   Menu.buildFromTemplate([
     {
-      label: 'New Note...',
+      label: 'New &Note...',
+      accelerator: process.platform === 'darwin' ? 'Command+N' : 'Ctrl+N',
       click: async () => mainWindow.webContents.send('menu-command:new-note', folder),
     },
   ]);
@@ -66,17 +67,22 @@ export default class MenuBuilder {
       label: 'File',
       submenu: [
         {
-          label: 'Open Workspace...',
-          accelerator: 'Command+O',
-          click: () => this.doOpenWorkspace(),
-        },
-        {
-          type: 'separator',
+          label: 'New Note...',
+          accelerator: 'Command+N',
+          click: async () => this.mainWindow.webContents.send('menu-command:new-note'),
         },
         {
           label: 'New Folder...',
           accelerator: 'Command+Shift+N',
           click: () => this.doCreateFolder(),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          label: 'Open Workspace...',
+          accelerator: 'Command+O',
+          click: () => this.doOpenWorkspace(),
         },
       ],
     };
@@ -189,17 +195,22 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open Workspace...',
-            accelerator: 'Ctrl+O',
-            click: () => this.doOpenWorkspace(),
-          },
-          {
-            type: 'separator',
+            label: 'New &Note...',
+            accelerator: 'Ctrl+N',
+            click: () => this.doCreateNote(),
           },
           {
             label: 'New &Folder...',
             accelerator: 'Ctrl+Shift+N',
             click: () => this.doCreateFolder(),
+          },
+          {
+            type: 'separator',
+          },
+          {
+            label: '&Open Workspace...',
+            accelerator: 'Ctrl+O',
+            click: () => this.doOpenWorkspace(),
           },
           {
             type: 'separator',
@@ -291,6 +302,10 @@ export default class MenuBuilder {
       applicationState.workspace = filePath;
       this.mainWindow.webContents.send('switched-workspace', filePath);
     }
+  }
+
+  private async doCreateNote() {
+    this.mainWindow.webContents.send('menu-command:new-note');
   }
 
   private async doCreateFolder() {
