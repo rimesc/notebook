@@ -137,3 +137,13 @@ export async function createFolder(folder: string): Promise<void> {
   log.debug(`Attempting to create <${folder}>`);
   return createDirectory(path.join(applicationState.workspace, folder));
 }
+
+/**
+ * Renames a folder.
+ * @param folder current name of the folder.
+ * @param newFile new name of the folder.
+ */
+export async function renameFolder(folder: string, newFolder: string): Promise<void> {
+  log.debug(`Attempting to rename <${folder}> to <${newFolder}>`);
+  return moveFile(path.join(applicationState.workspace, folder), path.join(applicationState.workspace, newFolder));
+}

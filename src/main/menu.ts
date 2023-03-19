@@ -13,6 +13,13 @@ export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
       accelerator: process.platform === 'darwin' ? 'Command+N' : 'Ctrl+N',
       click: async () => mainWindow.webContents.send('menu-command:new-note', folder),
     },
+    {
+      type: 'separator',
+    },
+    {
+      label: '&Rename...',
+      click: async () => mainWindow.webContents.send('menu-command:rename-folder', folder),
+    },
   ]);
 
 export const noteMenu = (folder: string, note: string, mainWindow: BrowserWindow) =>

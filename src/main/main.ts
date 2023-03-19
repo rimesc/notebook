@@ -13,7 +13,16 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
 import showDialog from './dialogs';
-import { createFolder, createNote, fetchNote, listFolders, listNotes, renameNote, saveNote } from './files';
+import {
+  createFolder,
+  createNote,
+  fetchNote,
+  listFolders,
+  listNotes,
+  renameFolder,
+  renameNote,
+  saveNote,
+} from './files';
 import MenuBuilder, { folderMenu, noteMenu } from './menu';
 import applicationState from './state';
 import { resolveHtmlPath } from './util';
@@ -54,6 +63,14 @@ ipcMain.on('create-folder', async (_, folder) => {
     await createFolder(folder);
     if (mainWindow) {
       mainWindow.webContents.send('created-folder', folder);
+    }
+  }
+});
+ipcMain.on('rename-folder', async (_, folder, newName) => {
+  if (folder && newName) {
+    await renameFolder(folder, newName);
+    if (mainWindow) {
+      mainWindow.webContents.send('renamed-folder', newName);
     }
   }
 });
