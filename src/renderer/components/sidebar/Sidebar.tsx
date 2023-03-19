@@ -31,19 +31,34 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
     {}
   );
 
+  // Load the list of folders.
+  const loadFolders = async () => {
+    try {
+      return setFolders(await electron.listFolders());
+    } catch (error) {
+      return console.log(error);
+    }
+  };
+
+  // Load the list of notes for a folder.
+  const loadNotes = async (folder: string) => {
+    try {
+      return dispatch({ folder, notes: await electron.listNotes(folder) });
+    } catch (error) {
+      return console.log(error);
+    }
+  };
+
   // Fetch list of folders when changing workspace.
   useEffect(() => {
     setFolders([]);
-    electron.listFolders().then(setFolders).catch(console.log);
+    loadFolders();
   }, [workspace]);
 
   // Fetch list of notes for a folder when the folder is opened for the first time.
   useEffect(() => {
     if (open && !(open in notes)) {
-      electron
-        .listNotes(open)
-        .then((n) => dispatch({ folder: open, notes: n }))
-        .catch(console.log);
+      loadNotes(open);
     }
   }, [notes, open]);
 
@@ -64,40 +79,31 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a note.
   useEffect(() => electron.onMenuCommandRenameNote((folder, note) => electron.showDialog('rename-note', folder, note)));
 
+  // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a folder.
+  useEffect(() => electron.onMenuCommandRenameFolder((folder) => electron.showDialog('rename-folder', folder)));
+
   // Refresh list of folders when a new folder has been created.
   useEffect(() =>
-    electron.onCreatedFolder((folder) => {
-      electron
-        .listFolders()
-        .then(setFolders)
-        .then(() => setOpen(folder))
-        .catch(console.log);
+    electron.onCreatedFolder(async (folder) => {
+      await loadFolders();
+      setOpen(folder);
     })
   );
 
   // Refresh list of notes for the affected folder when a new note has been created and select the new note.
   useEffect(() =>
-    electron.onCreatedNote((folder, note) => {
-      electron
-        .listNotes(folder)
-        .then((n) => dispatch({ folder, notes: n }))
-        .then(() => {
-          setOpen(folder);
-          return onSelect({ folder, note });
-        })
-        .catch(console.log);
+    electron.onCreatedNote(async (folder, note) => {
+      await loadNotes(folder);
+      setOpen(folder);
+      onSelect({ folder, note });
     })
   );
 
+  // Refresh list of folders when a folder has been renamed.
+  useEffect(() => electron.onRenamedFolder(loadFolders));
+
   // Refresh list of notes for the affected folder when a note has been renamed.
-  useEffect(() => {
-    return electron.onRenamedNote((folder) => {
-      electron
-        .listNotes(folder)
-        .then((n) => dispatch({ folder, notes: n }))
-        .catch(console.log);
-    });
-  });
+  useEffect(() => electron.onRenamedNote(loadNotes));
 
   const handleFolderClick = (folder: string) => {
     setOpen(open !== folder ? folder : undefined);

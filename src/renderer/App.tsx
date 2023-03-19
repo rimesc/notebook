@@ -5,6 +5,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import CreateFolder from './components/dialogs/CreateFolder';
 import CreateNote from './components/dialogs/CreateNote';
+import RenameFolder from './components/dialogs/RenameFolder';
 import RenameNote from './components/dialogs/RenameNote';
 import NoteDisplay from './components/note/NoteDisplay';
 import Sidebar from './components/sidebar/Sidebar';
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/create-note" element={<CreateNote />} />
         <Route path="/rename-note" element={<RenameNote />} />
         <Route path="/create-folder" element={<CreateFolder />} />
+        <Route path="/rename-folder" element={<RenameFolder />} />
       </Routes>
     </HashRouter>
   );
