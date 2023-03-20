@@ -1,6 +1,7 @@
 /* eslint no-console: off */
 import { Drawer, List, ListSubheader } from '@mui/material';
-import { useEffect, useReducer, useState } from 'react';
+import { useSnackbar } from 'notistack';
+import { useCallback, useEffect, useReducer, useState } from 'react';
 import { NoteKey } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
 import SidebarFolder from './SidebarFolder';
@@ -30,37 +31,41 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
     },
     {}
   );
+  const { enqueueSnackbar } = useSnackbar();
 
   // Load the list of folders.
-  const loadFolders = async () => {
+  const loadFolders = useCallback(async () => {
     try {
       return setFolders(await electron.listFolders());
     } catch (error) {
-      return console.log(error);
+      return enqueueSnackbar(`${error}`);
     }
-  };
+  }, [enqueueSnackbar]);
 
   // Load the list of notes for a folder.
-  const loadNotes = async (folder: string) => {
-    try {
-      return dispatch({ folder, notes: await electron.listNotes(folder) });
-    } catch (error) {
-      return console.log(error);
-    }
-  };
+  const loadNotes = useCallback(
+    async (folder: string) => {
+      try {
+        return dispatch({ folder, notes: await electron.listNotes(folder) });
+      } catch (error) {
+        return enqueueSnackbar(`${error}`);
+      }
+    },
+    [enqueueSnackbar]
+  );
 
   // Fetch list of folders when changing workspace.
   useEffect(() => {
     setFolders([]);
     loadFolders();
-  }, [workspace]);
+  }, [workspace, loadFolders]);
 
   // Fetch list of notes for a folder when the folder is opened for the first time.
   useEffect(() => {
     if (open && !(open in notes)) {
       loadNotes(open);
     }
-  }, [notes, open]);
+  }, [notes, open, loadNotes]);
 
   // Display modal dialog to choose a name when 'New Note...' menu item is triggered.
   useEffect(() =>
