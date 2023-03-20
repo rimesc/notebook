@@ -25,14 +25,10 @@ const MainView = () => {
 
   useEffect(() => {
     const getWorkspace = async () => {
-      try {
-        setWorkspace(await electron.getWorkspace());
-      } catch (error) {
-        enqueueSnackbar(`${error}`);
-      }
+      setWorkspace(await electron.getWorkspace());
     };
     getWorkspace();
-  }, [enqueueSnackbar]);
+  }, []);
 
   useEffect(
     () =>
@@ -43,26 +39,34 @@ const MainView = () => {
     []
   );
 
+  useEffect(() => electron.onError((message) => enqueueSnackbar(message, { variant: 'error' })), [enqueueSnackbar]);
+
   const offsetRef = useRef<HTMLDivElement>(null);
   const Offset = styled('div')(({ theme: t }) => t.mixins.toolbar);
 
   return (
-    <SnackbarProvider maxSnack={5} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} variant="error">
-      <Box sx={{ display: 'flex' }}>
-        <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="Folders">
-          <Sidebar width={drawerWidth} workspace={workspace} selected={selected} onSelect={setSelected} />
-        </Box>
-        <Box sx={{ width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` }, height: '100vh' }}>
-          <AppToolbar mode={selected && mode} onModeChange={setMode} />
-          <Offset ref={offsetRef} />
-          <Box
-            component="main"
-            sx={{ height: offsetRef.current ? `calc(100% - ${offsetRef.current.clientHeight}px)` : '100%' }}
-          >
-            <NoteDisplay note={selected} mode={mode} />
-          </Box>
+    <Box sx={{ display: 'flex' }}>
+      <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }} aria-label="Folders">
+        <Sidebar width={drawerWidth} workspace={workspace} selected={selected} onSelect={setSelected} />
+      </Box>
+      <Box sx={{ width: { xs: '100%', sm: `calc(100% - ${drawerWidth}px)` }, height: '100vh' }}>
+        <AppToolbar mode={selected && mode} onModeChange={setMode} />
+        <Offset ref={offsetRef} />
+        <Box
+          component="main"
+          sx={{ height: offsetRef.current ? `calc(100% - ${offsetRef.current.clientHeight}px)` : '100%' }}
+        >
+          <NoteDisplay note={selected} mode={mode} />
         </Box>
       </Box>
+    </Box>
+  );
+};
+
+const MainViewWithSnackBar = () => {
+  return (
+    <SnackbarProvider autoHideDuration={10000} maxSnack={5} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+      <MainView />
     </SnackbarProvider>
   );
 };
@@ -71,7 +75,7 @@ export default function App() {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<MainView />} />
+        <Route path="/" element={<MainViewWithSnackBar />} />
         <Route path="/create-note" element={<CreateNote />} />
         <Route path="/rename-note" element={<RenameNote />} />
         <Route path="/create-folder" element={<CreateFolder />} />

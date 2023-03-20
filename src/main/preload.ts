@@ -21,7 +21,8 @@ export type Channels =
   | 'menu-command:new-note'
   | 'menu-command:rename-note'
   | 'menu-command:new-folder'
-  | 'menu-command:rename-folder';
+  | 'menu-command:rename-folder'
+  | 'error';
 
 function on(channel: Channels, func: (...args: unknown[]) => void): () => void {
   const subscription = (_event: IpcRendererEvent, ...args: unknown[]) => func(...args);
@@ -72,6 +73,7 @@ const electronHandler = {
   onMenuCommandNewFolder: (func: () => void) => on('menu-command:new-folder', () => func()),
   onMenuCommandRenameFolder: (func: (folder: string) => void) =>
     on('menu-command:rename-folder', (folder) => func(folder as string)),
+  onError: (func: (message: string) => void) => on('error', (message) => func(message as string)),
 
   ipcRenderer: {
     once(channel: Channels, func: (...args: unknown[]) => void) {

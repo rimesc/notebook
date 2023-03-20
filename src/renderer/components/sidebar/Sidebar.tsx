@@ -1,6 +1,5 @@
 /* eslint no-console: off */
 import { Drawer, List, ListSubheader } from '@mui/material';
-import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { NoteKey } from '../../model';
 import { draggable, notDraggable } from '../../util/draggable';
@@ -31,28 +30,16 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
     },
     {}
   );
-  const { enqueueSnackbar } = useSnackbar();
 
   // Load the list of folders.
   const loadFolders = useCallback(async () => {
-    try {
-      return setFolders(await electron.listFolders());
-    } catch (error) {
-      return enqueueSnackbar(`${error}`);
-    }
-  }, [enqueueSnackbar]);
+    return setFolders(await electron.listFolders());
+  }, []);
 
   // Load the list of notes for a folder.
-  const loadNotes = useCallback(
-    async (folder: string) => {
-      try {
-        return dispatch({ folder, notes: await electron.listNotes(folder) });
-      } catch (error) {
-        return enqueueSnackbar(`${error}`);
-      }
-    },
-    [enqueueSnackbar]
-  );
+  const loadNotes = useCallback(async (folder: string) => {
+    return dispatch({ folder, notes: await electron.listNotes(folder) });
+  }, []);
 
   // Fetch list of folders when changing workspace.
   useEffect(() => {

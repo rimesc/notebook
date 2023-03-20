@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, Event, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import path from 'path';
@@ -37,43 +37,69 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const errorAwareAsyncHandler =
+  (listener: (event: Event, ...args: any[]) => Promise<any>) =>
+  async (event: Event, ...args: any[]) => {
+    try {
+      return await listener(event, ...args);
+    } catch (error) {
+      mainWindow?.webContents.send('error', error instanceof Error ? error.message : `${error}`);
+      throw error;
+    }
+  };
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 ipcMain.handle('get-workspace', () => applicationState.workspace);
-ipcMain.handle('list-folders', listFolders);
-ipcMain.handle('list-notes', (_, folder) => listNotes(folder));
-ipcMain.handle('fetch-note', (_, folder, note) => fetchNote(folder, note));
-ipcMain.on('save-note', (_, folder, note, content) => saveNote(folder, note, content));
-ipcMain.on('create-note', async (_, folder, note) => {
-  if (folder && note) {
-    await createNote(folder, note);
-    if (mainWindow) {
-      mainWindow.webContents.send('created-note', folder, note);
+ipcMain.handle('list-folders', errorAwareAsyncHandler(listFolders));
+ipcMain.handle(
+  'list-notes',
+  errorAwareAsyncHandler((_, folder) => listNotes(folder))
+);
+ipcMain.handle(
+  'fetch-note',
+  errorAwareAsyncHandler((_, folder, note) => fetchNote(folder, note))
+);
+ipcMain.on(
+  'save-note',
+  errorAwareAsyncHandler((_, folder, note, content) => saveNote(folder, note, content))
+);
+ipcMain.on(
+  'create-note',
+  errorAwareAsyncHandler(async (_, folder, note) => {
+    if (folder && note) {
+      await createNote(folder, note);
+      mainWindow?.webContents.send('created-note', folder, note);
     }
-  }
-});
-ipcMain.on('rename-note', async (_, folder, note, newName) => {
-  if (folder && note && newName) {
-    await renameNote(folder, note, newName);
-    if (mainWindow) {
-      mainWindow.webContents.send('renamed-note', folder, newName);
+  })
+);
+ipcMain.on(
+  'rename-note',
+  errorAwareAsyncHandler(async (_, folder, note, newName) => {
+    if (folder && note && newName) {
+      await renameNote(folder, note, newName);
+      mainWindow?.webContents.send('renamed-note', folder, newName);
     }
-  }
-});
-ipcMain.on('create-folder', async (_, folder) => {
-  if (folder) {
-    await createFolder(folder);
-    if (mainWindow) {
-      mainWindow.webContents.send('created-folder', folder);
+  })
+);
+ipcMain.on(
+  'create-folder',
+  errorAwareAsyncHandler(async (_, folder) => {
+    if (folder) {
+      await createFolder(folder);
+      mainWindow?.webContents.send('created-folder', folder);
     }
-  }
-});
-ipcMain.on('rename-folder', async (_, folder, newName) => {
-  if (folder && newName) {
-    await renameFolder(folder, newName);
-    if (mainWindow) {
-      mainWindow.webContents.send('renamed-folder', newName);
+  })
+);
+ipcMain.on(
+  'rename-folder',
+  errorAwareAsyncHandler(async (_, folder, newName) => {
+    if (folder && newName) {
+      await renameFolder(folder, newName);
+      mainWindow?.webContents.send('renamed-folder', newName);
     }
-  }
-});
+  })
+);
 ipcMain.on('show-folder-menu', (_, folder) => {
   if (mainWindow) {
     folderMenu(folder, mainWindow).popup({ window: mainWindow });
