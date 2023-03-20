@@ -14,8 +14,6 @@ interface Props {
   onSelect: (note: NoteKey) => void;
 }
 
-const { electron } = window;
-
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
@@ -33,12 +31,12 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
 
   // Load the list of folders.
   const loadFolders = useCallback(async () => {
-    return setFolders(await electron.listFolders());
+    return setFolders(await window.electron.listFolders());
   }, []);
 
   // Load the list of notes for a folder.
   const loadNotes = useCallback(async (folder: string) => {
-    return dispatch({ folder, notes: await electron.listNotes(folder) });
+    return dispatch({ folder, notes: await window.electron.listNotes(folder) });
   }, []);
 
   // Fetch list of folders when changing workspace.
@@ -56,27 +54,31 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
 
   // Display modal dialog to choose a name when 'New Note...' menu item is triggered.
   useEffect(() =>
-    electron.onMenuCommandNewNote((folder) => {
+    window.electron.onMenuCommandNewNote((folder) => {
       // If the command is triggered from the main menu, target the currently open folder (if any).
       const targetFolder = folder ?? open;
       if (targetFolder) {
-        electron.showDialog('create-note', targetFolder);
+        window.electron.showDialog('create-note', targetFolder);
       }
     })
   );
 
   // Display modal dialog to choose a name when 'New Folder...' menu item is triggered.
-  useEffect(() => electron.onMenuCommandNewFolder(() => electron.showDialog('create-folder')));
+  useEffect(() => window.electron.onMenuCommandNewFolder(() => window.electron.showDialog('create-folder')));
 
   // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a note.
-  useEffect(() => electron.onMenuCommandRenameNote((folder, note) => electron.showDialog('rename-note', folder, note)));
+  useEffect(() =>
+    window.electron.onMenuCommandRenameNote((folder, note) => window.electron.showDialog('rename-note', folder, note))
+  );
 
   // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a folder.
-  useEffect(() => electron.onMenuCommandRenameFolder((folder) => electron.showDialog('rename-folder', folder)));
+  useEffect(() =>
+    window.electron.onMenuCommandRenameFolder((folder) => window.electron.showDialog('rename-folder', folder))
+  );
 
   // Refresh list of folders when a new folder has been created.
   useEffect(() =>
-    electron.onCreatedFolder(async (folder) => {
+    window.electron.onCreatedFolder(async (folder) => {
       await loadFolders();
       setOpen(folder);
     })
@@ -84,7 +86,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
 
   // Refresh list of notes for the affected folder when a new note has been created and select the new note.
   useEffect(() =>
-    electron.onCreatedNote(async (folder, note) => {
+    window.electron.onCreatedNote(async (folder, note) => {
       await loadNotes(folder);
       setOpen(folder);
       onSelect({ folder, note });
@@ -92,17 +94,17 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   );
 
   // Refresh list of folders when a folder has been renamed.
-  useEffect(() => electron.onRenamedFolder(loadFolders));
+  useEffect(() => window.electron.onRenamedFolder(loadFolders));
 
   // Refresh list of notes for the affected folder when a note has been renamed.
-  useEffect(() => electron.onRenamedNote(loadNotes));
+  useEffect(() => window.electron.onRenamedNote(loadNotes));
 
   const handleFolderClick = (folder: string) => {
     setOpen(open !== folder ? folder : undefined);
   };
 
   const handleFolderMenu = (folder: string) => {
-    electron.showFolderMenu(folder);
+    window.electron.showFolderMenu(folder);
   };
 
   const handleNoteClick = (folder: string, note: string) => {
@@ -112,7 +114,7 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
   };
 
   const handleNoteMenu = (folder: string, note: string) => {
-    electron.showNoteMenu(folder, note);
+    window.electron.showNoteMenu(folder, note);
   };
 
   return (

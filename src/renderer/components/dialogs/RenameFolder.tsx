@@ -1,29 +1,27 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const { electron } = window;
-
 const RenameFolder = () => {
   const [originalName, setOriginalName] = useState<string | undefined>(undefined);
   const [folders, setFolders] = useState<string[] | undefined>(undefined);
 
   useEffect(() => {
-    return electron.onInitRenameFolderDialog((folder) => {
+    return window.electron.onInitRenameFolderDialog((folder) => {
       setOriginalName(folder);
     });
   }, []);
 
   useEffect(() => {
     const loadFolders = async () => {
-      setFolders((await electron.listFolders()).map((name) => name.toLowerCase()));
+      setFolders((await window.electron.listFolders()).map((name) => name.toLowerCase()));
     };
     loadFolders();
   }, []);
 
   const handleSubmit = (name: string) => {
     if (originalName) {
-      electron.renameFolder(originalName, name);
-      electron.closeDialog();
+      window.electron.renameFolder(originalName, name);
+      window.electron.closeDialog();
     }
   };
 
@@ -40,7 +38,7 @@ const RenameFolder = () => {
       originalName={originalName}
       validate={validateName}
       onSubmit={handleSubmit}
-      onCancel={electron.closeDialog}
+      onCancel={window.electron.closeDialog}
     />
   );
 };

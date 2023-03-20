@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const { electron } = window;
-
 const RenameNote = () => {
   const [folder, setFolder] = useState<string | undefined>(undefined);
   const [originalName, setOriginalName] = useState<string | undefined>(undefined);
   const [files, setFiles] = useState<string[] | undefined>(undefined);
 
   useEffect(() => {
-    return electron.onInitRenameNoteDialog((parentFolder, note) => {
+    return window.electron.onInitRenameNoteDialog((parentFolder, note) => {
       setFolder(parentFolder);
       setOriginalName(note);
     });
@@ -18,7 +16,7 @@ const RenameNote = () => {
   useEffect(() => {
     const loadNotes = async () => {
       if (folder) {
-        setFiles((await electron.listNotes(folder)).map((name) => name.toLowerCase()));
+        setFiles((await window.electron.listNotes(folder)).map((name) => name.toLowerCase()));
       }
     };
     loadNotes();
@@ -26,8 +24,8 @@ const RenameNote = () => {
 
   const handleSubmit = (name: string) => {
     if (folder && originalName) {
-      electron.renameNote(folder, originalName, name);
-      electron.closeDialog();
+      window.electron.renameNote(folder, originalName, name);
+      window.electron.closeDialog();
     }
   };
 
@@ -44,7 +42,7 @@ const RenameNote = () => {
       originalName={originalName}
       validate={validateName}
       onSubmit={handleSubmit}
-      onCancel={electron.closeDialog}
+      onCancel={window.electron.closeDialog}
     />
   );
 };

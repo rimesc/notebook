@@ -15,8 +15,6 @@ import { NoteKey } from './model';
 
 const drawerWidth = 240;
 
-const { electron } = window;
-
 const MainView = () => {
   const [workspace, setWorkspace] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<NoteKey | undefined>(undefined);
@@ -25,21 +23,24 @@ const MainView = () => {
 
   useEffect(() => {
     const getWorkspace = async () => {
-      setWorkspace(await electron.getWorkspace());
+      setWorkspace(await window.electron.getWorkspace());
     };
     getWorkspace();
   }, []);
 
   useEffect(
     () =>
-      electron.onSwitchedWorkspace((newWorkspace) => {
+      window.electron.onSwitchedWorkspace((newWorkspace) => {
         setSelected(undefined);
         setWorkspace(newWorkspace);
       }),
     []
   );
 
-  useEffect(() => electron.onError((message) => enqueueSnackbar(message, { variant: 'error' })), [enqueueSnackbar]);
+  useEffect(
+    () => window.electron.onError((message) => enqueueSnackbar(message, { variant: 'error' })),
+    [enqueueSnackbar]
+  );
 
   const offsetRef = useRef<HTMLDivElement>(null);
   const Offset = styled('div')(({ theme: t }) => t.mixins.toolbar);

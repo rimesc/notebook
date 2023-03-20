@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const { electron } = window;
-
 const CreateNote = () => {
   const [folder, setFolder] = useState<string | undefined>(undefined);
   const [files, setFiles] = useState<string[] | undefined>(undefined);
 
   useEffect(() => {
-    return electron.onInitCreateNoteDialog(setFolder);
+    return window.electron.onInitCreateNoteDialog(setFolder);
   }, []);
 
   useEffect(() => {
     const loadNotes = async () => {
       if (folder) {
-        setFiles((await electron.listNotes(folder)).map((name) => name.toLowerCase()));
+        setFiles((await window.electron.listNotes(folder)).map((name) => name.toLowerCase()));
       }
     };
     loadNotes();
@@ -22,8 +20,8 @@ const CreateNote = () => {
 
   const handleSubmit = (name: string) => {
     if (folder) {
-      electron.createNote(folder, name);
-      electron.closeDialog();
+      window.electron.createNote(folder, name);
+      window.electron.closeDialog();
     }
   };
 
@@ -32,7 +30,7 @@ const CreateNote = () => {
       placeholder="New note"
       validate={(name) => (name && files ? !files.includes(name.toLowerCase()) : false)}
       onSubmit={handleSubmit}
-      onCancel={electron.closeDialog}
+      onCancel={window.electron.closeDialog}
     />
   );
 };
