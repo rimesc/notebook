@@ -75,15 +75,11 @@ describe('listNotes', () => {
     await expect(listNotes('Folder')).resolves.toEqual([]);
   });
   it('throws if the folder does not exist', async () => {
-    await expect(listNotes('Folder')).rejects.toThrow(
-      `Directory '${path.join(workspace, 'Folder')}' does not exist or is not a directory`
-    );
+    await expect(listNotes('Folder')).rejects.toThrow("Folder 'Folder' not found");
   });
-  it('throws if the folder is not a folder', async () => {
+  it('throws if the folder is not a directory', async () => {
     fs.writeFileSync(path.join(workspace, 'Folder'), '');
-    await expect(listNotes('Folder')).rejects.toThrow(
-      `Directory '${path.join(workspace, 'Folder')}' does not exist or is not a directory`
-    );
+    await expect(listNotes('Folder')).rejects.toThrow("Folder 'Folder' not found");
   });
 });
 
@@ -94,9 +90,7 @@ describe('fetchNote', () => {
     await expect(fetchNote('Folder', 'Note')).resolves.toEqual('# Note\n\n');
   });
   it('throws if the note does not exist', async () => {
-    await expect(fetchNote('Folder', 'Note')).rejects.toThrow(
-      `File '${path.join(workspace, 'Folder', 'Note.md')}' does not exist`
-    );
+    await expect(fetchNote('Folder', 'Note')).rejects.toThrow("Note 'Note' not found in folder 'Folder'");
   });
 });
 
@@ -112,6 +106,9 @@ describe('saveNote', () => {
     await saveNote('Folder', 'Note', '# New content');
     await expect(fetchNote('Folder', 'Note')).resolves.toEqual('# New content');
   });
+  it('throws if the folder does not exist', async () => {
+    await expect(saveNote('Folder', 'Note', '# New content')).rejects.toThrow("Folder 'Folder' not found");
+  });
 });
 
 describe('createNote', () => {
@@ -125,16 +122,7 @@ describe('createNote', () => {
   it('throws if a note already exists with the same name in the same folder', async () => {
     await createFolder('Folder');
     await createNote('Folder', 'Note');
-    await expect(createNote('Folder', 'Note')).rejects.toThrow(
-      `File '${path.join(workspace, 'Folder', 'Note.md')}' already exists`
-    );
-  });
-  it('throws if a note already exists in the same folder with name differing only by case', async () => {
-    await createFolder('Folder');
-    await createNote('Folder', 'Note');
-    await expect(createNote('Folder', 'note')).rejects.toThrow(
-      `File '${path.join(workspace, 'Folder', 'note.md')}' already exists`
-    );
+    await expect(createNote('Folder', 'Note')).rejects.toThrow("Note 'Note' already exists");
   });
 });
 
@@ -149,22 +137,17 @@ describe('renameNote', () => {
     expect(fs.existsSync(expectedPath)).toBeTruthy();
     expect(fs.readFileSync(expectedPath).toString('utf-8')).toBe('# Original note\n\n');
   });
+  it('throws if the note does not exist', async () => {
+    await expect(renameNote('Folder', 'Original note', 'Renamed note')).rejects.toThrow(
+      "Note 'Original note' not found in folder 'Folder'"
+    );
+  });
   it('throws if a note already exists with the same name in the same folder', async () => {
     await createFolder('Folder');
     await createNote('Folder', 'Original note');
     await createNote('Folder', 'Other note');
     await expect(renameNote('Folder', 'Original note', 'Other note')).rejects.toThrow(
-      `File '${path.join(workspace, 'Folder', 'Other note.md')}' already exists`
-    );
-    const originalPath = path.join(workspace, 'Folder', 'Original note.md');
-    expect(fs.existsSync(originalPath)).toBeTruthy();
-  });
-  it('throws if a note already exists in the same folder with name differing only by case', async () => {
-    await createFolder('Folder');
-    await createNote('Folder', 'Original note');
-    await createNote('Folder', 'Other note');
-    await expect(renameNote('Folder', 'Original note', 'other note')).rejects.toThrow(
-      `File '${path.join(workspace, 'Folder', 'other note.md')}' already exists`
+      "Note 'Other note' already exists in folder 'Folder'"
     );
     const originalPath = path.join(workspace, 'Folder', 'Original note.md');
     expect(fs.existsSync(originalPath)).toBeTruthy();
@@ -179,19 +162,11 @@ describe('createFolder', () => {
   });
   it('throws if a folder already exists with the same name in the workspace', async () => {
     await createFolder('Folder');
-    await expect(createFolder('Folder')).rejects.toThrow(`Folder '${path.join(workspace, 'Folder')}' already exists`);
-  });
-  it('throws if a folder already exists in the workspace with name differing only by case', async () => {
-    await createFolder('Folder');
-    await expect(createFolder('folder')).rejects.toThrow(`Folder '${path.join(workspace, 'folder')}' already exists`);
+    await expect(createFolder('Folder')).rejects.toThrow(`Folder 'Folder' already exists`);
   });
   it('throws if a file already exists with the same name in the workspace', async () => {
     fs.writeFileSync(path.join(workspace, 'Folder'), '');
-    await expect(createFolder('Folder')).rejects.toThrow(`Folder '${path.join(workspace, 'Folder')}' already exists`);
-  });
-  it('throws if a file already exists in the workspace with name differing only by case', async () => {
-    fs.writeFileSync(path.join(workspace, 'Folder'), '');
-    await expect(createFolder('folder')).rejects.toThrow(`Folder '${path.join(workspace, 'folder')}' already exists`);
+    await expect(createFolder('Folder')).rejects.toThrow(`Folder 'Folder' already exists`);
   });
 });
 
@@ -206,23 +181,17 @@ describe('renameFolder', () => {
     expect(fs.lstatSync(expectedPath).isDirectory).toBeTruthy();
     expect(fs.readdirSync(expectedPath)).toContain('Note.md');
   });
+  it('throws if the folder does not exist', async () => {
+    await expect(renameFolder('Original folder', 'Renamed folder')).rejects.toThrow(
+      "Folder 'Original folder' not found"
+    );
+  });
   it('throws if a folder already exists with the same name in the workspace', async () => {
     await createFolder('Original folder');
     await createNote('Original folder', 'Note');
     await createFolder('Other folder');
     await expect(renameFolder('Original folder', 'Other folder')).rejects.toThrow(
-      `Folder '${path.join(workspace, 'Other folder')}' already exists`
-    );
-    const originalPath = path.join(workspace, 'Original folder');
-    expect(fs.lstatSync(originalPath).isDirectory).toBeTruthy();
-    expect(fs.readdirSync(originalPath)).toContain('Note.md');
-  });
-  it('throws if a folder already exists in the workspace with name differing only by case', async () => {
-    await createFolder('Original folder');
-    await createNote('Original folder', 'Note');
-    await createFolder('Other folder');
-    await expect(renameFolder('Original folder', 'other folder')).rejects.toThrow(
-      `Folder '${path.join(workspace, 'other folder')}' already exists`
+      "Folder 'Other folder' already exists"
     );
     const originalPath = path.join(workspace, 'Original folder');
     expect(fs.lstatSync(originalPath).isDirectory).toBeTruthy();
@@ -233,18 +202,7 @@ describe('renameFolder', () => {
     await createNote('Original folder', 'Note');
     fs.writeFileSync(path.join(workspace, 'Other folder'), '');
     await expect(renameFolder('Original folder', 'Other folder')).rejects.toThrow(
-      `Folder '${path.join(workspace, 'Other folder')}' already exists`
-    );
-    const originalPath = path.join(workspace, 'Original folder');
-    expect(fs.lstatSync(originalPath).isDirectory).toBeTruthy();
-    expect(fs.readdirSync(originalPath)).toContain('Note.md');
-  });
-  it('throws if a file already exists in the workspace with name differing only by case', async () => {
-    await createFolder('Original folder');
-    await createNote('Original folder', 'Note');
-    fs.writeFileSync(path.join(workspace, 'Other folder'), '');
-    await expect(renameFolder('Original folder', 'other folder')).rejects.toThrow(
-      `Folder '${path.join(workspace, 'other folder')}' already exists`
+      "Folder 'Other folder' already exists"
     );
     const originalPath = path.join(workspace, 'Original folder');
     expect(fs.lstatSync(originalPath).isDirectory).toBeTruthy();

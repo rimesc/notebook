@@ -1,75 +1,52 @@
 import log from 'electron-log';
-import fs from 'fs';
+import fs from 'fs/promises';
+import filterAsync from 'node-filter-async';
 import path from 'path';
 import applicationState from './state';
 
-function isDirectory(p: string): boolean {
-  return fs.lstatSync(p).isDirectory();
-}
+const errorCode = (error: any) => error.code as string | undefined;
+const folderPath = (folder: string) => path.join(applicationState.workspace, folder);
+const filePath = (folder: string, file: string) => path.join(folderPath(folder), `${file}.md`);
+const isHidden = (file: string) => path.basename(file).startsWith('.');
 
-function isFile(p: string): boolean {
-  return fs.lstatSync(p).isFile();
-}
-
-function isHidden(p: string): boolean {
-  return path.basename(p).startsWith('.');
-}
-
-function isMarkdown(p: string): boolean {
-  return isFile(p) && path.extname(p).toLowerCase() === '.md';
-}
-
-async function listFiles(dir: string): Promise<string[]> {
-  if (!fs.existsSync(dir) || !isDirectory(dir)) {
-    throw new Error(`Directory '${dir}' does not exist or is not a directory`);
+async function exists(p: string): Promise<boolean> {
+  try {
+    await fs.stat(p);
+    return true;
+  } catch (error) {
+    if (errorCode(error) === 'ENOENT') {
+      return false;
+    }
+    throw error;
   }
-  return new Promise<string[]>((resolve, reject) => {
-    // return the full path to each file
-    fs.readdir(dir, (err, files) => (err ? reject(err) : resolve(files.map((name) => path.join(dir, name)))));
-  });
 }
 
-async function readFile(file: string, encoding: BufferEncoding): Promise<string> {
-  if (!fs.existsSync(file)) {
-    throw new Error(`File '${file}' does not exist`);
+async function isDirectory(p: string): Promise<boolean> {
+  try {
+    const lstat = await fs.stat(p);
+    return lstat.isDirectory();
+  } catch (error) {
+    if (errorCode(error) === 'ENOENT') {
+      return false;
+    }
+    throw error;
   }
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(file, (err, buffer) => (err ? reject(err) : resolve(buffer.toString(encoding))));
-  });
 }
 
-async function writeFile(file: string, content: string, encoding: BufferEncoding): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    fs.writeFile(file, Buffer.from(content, encoding), (err) => (err ? reject(err) : resolve()));
-  });
+async function isFile(p: string): Promise<boolean> {
+  try {
+    const lstat = await fs.stat(p);
+    return lstat.isFile();
+  } catch (error) {
+    if (errorCode(error) === 'ENOENT') {
+      return false;
+    }
+    throw error;
+  }
 }
 
-async function createFile(file: string, content = ''): Promise<void> {
-  if (fs.existsSync(file)) {
-    throw new Error(`File '${file}' already exists`);
-  }
-  return writeFile(file, content, 'utf-8');
-}
-
-async function moveFile(from: string, to: string): Promise<void> {
-  if (fs.existsSync(to)) {
-    const directory = isDirectory(from);
-    throw new Error(`${directory ? 'Folder' : 'File'} '${to}' already exists`);
-  }
-  const parent = path.dirname(to);
-  if (!fs.existsSync(parent) || !isDirectory(parent)) {
-    throw new Error(`Directory '${parent}' does not exist or is not a directory`);
-  }
-  return new Promise<void>((resolve, reject) => {
-    fs.rename(from, to, (err) => (err ? reject(err) : resolve()));
-  });
-}
-
-async function createDirectory(folder: string): Promise<void> {
-  if (fs.existsSync(folder)) {
-    throw new Error(`Folder '${folder}' already exists`);
-  }
-  return fs.mkdirSync(folder);
+async function isMarkdown(p: string): Promise<boolean> {
+  return (await isFile(p)) && path.extname(p).toLowerCase() === '.md';
 }
 
 /**
@@ -77,8 +54,24 @@ async function createDirectory(folder: string): Promise<void> {
  * @returns list of folder names.
  */
 export async function listFolders(): Promise<string[]> {
-  const files = await listFiles(applicationState.workspace);
-  return files.filter((file) => isDirectory(file) && !isHidden(file)).map((file) => path.basename(file));
+  async function list() {
+    try {
+      const entries = await fs.readdir(applicationState.workspace);
+      return entries.map((entry) => folderPath(entry));
+    } catch (error) {
+      switch (errorCode(error)) {
+        case 'ENOENT':
+        case 'ENOTDIR':
+          throw new Error('Workspace not found');
+        default:
+          throw error;
+      }
+    }
+  }
+  const entries = await list();
+  return (await filterAsync(entries, async (entry) => (await isDirectory(entry)) && !isHidden(entry))).map((file) =>
+    path.basename(file)
+  );
 }
 
 /**
@@ -87,8 +80,25 @@ export async function listFolders(): Promise<string[]> {
  * @returns list of note names.
  */
 export async function listNotes(folder: string): Promise<string[]> {
-  const files = await listFiles(path.join(applicationState.workspace, folder));
-  return files.filter((file) => isMarkdown(file) && !isHidden(file)).map((file) => path.basename(file, '.md'));
+  const pathToFolder = folderPath(folder);
+  async function list() {
+    try {
+      const entries = await fs.readdir(pathToFolder);
+      return entries.map((entry) => path.join(pathToFolder, entry));
+    } catch (error) {
+      switch (errorCode(error)) {
+        case 'ENOENT':
+        case 'ENOTDIR':
+          throw new Error(`Folder '${folder}' not found`);
+        default:
+          throw error;
+      }
+    }
+  }
+  const entries = await list();
+  return (await filterAsync(entries, async (entry) => (await isMarkdown(entry)) && !isHidden(entry))).map((file) =>
+    path.basename(file, '.md')
+  );
 }
 
 /**
@@ -98,7 +108,17 @@ export async function listNotes(folder: string): Promise<string[]> {
  * @returns contents of the note.
  */
 export async function fetchNote(folder: string, file: string): Promise<string> {
-  return readFile(path.join(applicationState.workspace, folder, `${file}.md`), 'utf-8');
+  const pathToFile = filePath(folder, file);
+  try {
+    return await fs.readFile(pathToFile, 'utf-8');
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Note '${file}' not found in folder '${folder}'`);
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -109,7 +129,17 @@ export async function fetchNote(folder: string, file: string): Promise<string> {
  */
 export async function saveNote(folder: string, file: string, content: string): Promise<void> {
   log.debug(`Saving <${folder}/${file}>`);
-  return writeFile(path.join(applicationState.workspace, folder, `${file}.md`), content, 'utf-8');
+  const pathToFile = filePath(folder, file);
+  try {
+    return await fs.writeFile(pathToFile, content, 'utf-8');
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Folder '${folder}' not found`);
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -120,7 +150,20 @@ export async function saveNote(folder: string, file: string, content: string): P
  */
 export async function createNote(folder: string, file: string): Promise<void> {
   log.debug(`Attempting to create <${folder}/${file}>`);
-  return createFile(path.join(applicationState.workspace, folder, `${file}.md`), `# ${file}\n\n`);
+  const pathToFile = filePath(folder, file);
+  if (await exists(pathToFile)) {
+    throw new Error(`Note '${file}' already exists`);
+  }
+  try {
+    return fs.writeFile(pathToFile, `# ${file}\n\n`, 'utf-8');
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Folder '${folder}' not found`);
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -131,8 +174,21 @@ export async function createNote(folder: string, file: string): Promise<void> {
  */
 export async function renameNote(folder: string, file: string, newFile: string): Promise<void> {
   log.debug(`Attempting to rename <${folder}/${file}> to <${newFile}>`);
-  const parentDirectory = path.join(applicationState.workspace, folder);
-  return moveFile(path.join(parentDirectory, `${file}.md`), path.join(parentDirectory, `${newFile}.md`));
+  const fromPath = filePath(folder, file);
+  const toPath = filePath(folder, newFile);
+  if (await exists(toPath)) {
+    throw new Error(`Note '${newFile}' already exists in folder '${folder}'`);
+  }
+  try {
+    await fs.rename(fromPath, toPath);
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Note '${file}' not found in folder '${folder}'`);
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -142,7 +198,18 @@ export async function renameNote(folder: string, file: string, newFile: string):
  */
 export async function createFolder(folder: string): Promise<void> {
   log.debug(`Attempting to create <${folder}>`);
-  return createDirectory(path.join(applicationState.workspace, folder));
+  try {
+    await fs.mkdir(folderPath(folder));
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'EEXIST':
+        throw new Error(`Folder '${folder}' already exists`);
+      case 'ENOENT':
+        throw new Error(`Workspace not found`);
+      default:
+        throw error;
+    }
+  }
 }
 
 /**
@@ -152,5 +219,19 @@ export async function createFolder(folder: string): Promise<void> {
  */
 export async function renameFolder(folder: string, newFolder: string): Promise<void> {
   log.debug(`Attempting to rename <${folder}> to <${newFolder}>`);
-  return moveFile(path.join(applicationState.workspace, folder), path.join(applicationState.workspace, newFolder));
+  const fromPath = folderPath(folder);
+  const toPath = folderPath(newFolder);
+  if (await exists(toPath)) {
+    throw new Error(`Folder '${newFolder}' already exists`);
+  }
+  try {
+    await fs.rename(fromPath, toPath);
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Folder '${folder}' not found`);
+      default:
+        throw error;
+    }
+  }
 }
