@@ -20,6 +20,9 @@ function isMarkdown(p: string): boolean {
 }
 
 async function listFiles(dir: string): Promise<string[]> {
+  if (!fs.existsSync(dir) || !isDirectory(dir)) {
+    throw new Error(`Directory '${dir}' does not exist or is not a directory`);
+  }
   return new Promise<string[]>((resolve, reject) => {
     // return the full path to each file
     fs.readdir(dir, (err, files) => (err ? reject(err) : resolve(files.map((name) => path.join(dir, name)))));
@@ -27,6 +30,9 @@ async function listFiles(dir: string): Promise<string[]> {
 }
 
 async function readFile(file: string, encoding: BufferEncoding): Promise<string> {
+  if (!fs.existsSync(file)) {
+    throw new Error(`File '${file}' does not exist`);
+  }
   return new Promise<string>((resolve, reject) => {
     fs.readFile(file, (err, buffer) => (err ? reject(err) : resolve(buffer.toString(encoding))));
   });
@@ -47,7 +53,8 @@ async function createFile(file: string, content = ''): Promise<void> {
 
 async function moveFile(from: string, to: string): Promise<void> {
   if (fs.existsSync(to)) {
-    throw new Error(`File '${to}' already exists`);
+    const directory = isDirectory(from);
+    throw new Error(`${directory ? 'Folder' : 'File'} '${to}' already exists`);
   }
   const parent = path.dirname(to);
   if (!fs.existsSync(parent) || !isDirectory(parent)) {

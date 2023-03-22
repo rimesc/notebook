@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { ElectronHandler } from '../main/preload';
 import App from '../renderer/App';
 
@@ -42,6 +42,8 @@ window.electron = electronHandler;
 
 describe('App', () => {
   it('should render', () => {
-    expect(render(<App />)).toBeTruthy();
+    const app = render(<App />);
+    expect(app).toBeTruthy();
+    waitFor(() => expect(app.findByText('Folder')).toBeTruthy());
   });
 });
