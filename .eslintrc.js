@@ -8,6 +8,7 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
     'import/no-import-module-exports': 'off',
+    'no-undef': 'off',
     'react/require-default-props': [
       'error',
       {
