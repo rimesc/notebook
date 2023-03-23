@@ -6,7 +6,7 @@ import MarkdownIt from 'markdown-it';
 import container from 'markdown-it-container';
 import deflist from 'markdown-it-deflist';
 import footnote from 'markdown-it-footnote';
-import './Viewer.css';
+import './Viewer.scss';
 
 interface Props {
   markdown: string | undefined;
@@ -40,10 +40,13 @@ export default function Viewer({ markdown }: Props) {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
-        {
-          // eslint-disable-next-line react/no-danger
-          markdown ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }} /> : null
-        }
+        {markdown ? (
+          <div
+            className="markdown-it"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }}
+          />
+        ) : null}
       </Box>
     </Box>
   );
