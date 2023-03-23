@@ -54,9 +54,7 @@ export default function DeleteNote() {
           justifyContent: 'space-around',
         }}
       >
-        <Button disableFocusRipple onClick={window.electron.closeDialog} autoFocus>
-          Cancel
-        </Button>
+        <Button onClick={window.electron.closeDialog}>Cancel</Button>
         <Button color="error" disableElevation onClick={handleSubmit}>
           Delete
         </Button>
