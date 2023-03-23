@@ -9,7 +9,7 @@ interface Props {
   onModeChange: (mode: Mode) => void;
 }
 
-const AppToolbar = ({ mode, onModeChange: onModeChanged }: Props) => {
+export default function AppToolbar({ mode, onModeChange: onModeChanged }: Props) {
   const theme = useTheme();
 
   const handleModeChange = (_: React.MouseEvent<HTMLElement>, newMode: Mode) => {
@@ -49,6 +49,4 @@ const AppToolbar = ({ mode, onModeChange: onModeChanged }: Props) => {
       </Toolbar>
     </AppBar>
   );
-};
-
-export default AppToolbar;
+}

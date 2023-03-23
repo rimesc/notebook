@@ -15,7 +15,7 @@ import { NoteKey } from './model';
 
 const drawerWidth = 240;
 
-const MainView = () => {
+function MainView() {
   const [workspace, setWorkspace] = useState<string | undefined>(undefined);
   const [selected, setSelected] = useState<NoteKey | undefined>(undefined);
   const [mode, setMode] = useState<'edit' | 'view'>('view');
@@ -62,17 +62,17 @@ const MainView = () => {
       </Box>
     </Box>
   );
-};
+}
 
-const MainViewWithSnackBar = () => {
+function MainViewWithSnackBar() {
   return (
     <SnackbarProvider autoHideDuration={10000} maxSnack={5} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
       <MainView />
     </SnackbarProvider>
   );
-};
+}
 
-const App = () => {
+export default function App() {
   return (
     <HashRouter>
       <Routes>
@@ -84,6 +84,4 @@ const App = () => {
       </Routes>
     </HashRouter>
   );
-};
-
-export default App;
+}

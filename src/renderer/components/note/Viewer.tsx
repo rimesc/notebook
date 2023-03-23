@@ -36,7 +36,7 @@ const md = new MarkdownIt({
 /**
  * Displays a formatted note.
  */
-const Viewer = ({ markdown }: Props) => {
+export default function Viewer({ markdown }: Props) {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
@@ -47,6 +47,4 @@ const Viewer = ({ markdown }: Props) => {
       </Box>
     </Box>
   );
-};
-
-export default Viewer;
+}

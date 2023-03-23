@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const RenameNote = () => {
+export default function RenameNote() {
   const [folder, setFolder] = useState<string | undefined>(undefined);
   const [originalName, setOriginalName] = useState<string | undefined>(undefined);
   const [files, setFiles] = useState<string[] | undefined>(undefined);
@@ -45,6 +45,4 @@ const RenameNote = () => {
       onCancel={window.electron.closeDialog}
     />
   );
-};
-
-export default RenameNote;
+}

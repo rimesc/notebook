@@ -8,7 +8,7 @@ interface Props {
 /**
  * Allows editing of a note.
  */
-const Editor = ({ markdown, onChange }: Props) => {
+export default function Editor({ markdown, onChange }: Props) {
   return (
     <Box sx={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <Box sx={{ p: 3 }}>
@@ -31,6 +31,4 @@ const Editor = ({ markdown, onChange }: Props) => {
       </Box>
     </Box>
   );
-};
-
-export default Editor;
+}

@@ -14,7 +14,7 @@ interface Props {
 /**
  * Displays a folder with a collapsible list of notes for the sidebar.
  */
-const SidebarFolder = ({ name, open, onToggle, onContextMenu, children = undefined }: Props) => {
+export default function SidebarFolder({ name, open, onToggle, onContextMenu, children = undefined }: Props) {
   const handleFolderAuxClick = (e: MouseEvent<HTMLDivElement> | undefined) => {
     if (e) {
       e.preventDefault();
@@ -41,6 +41,4 @@ const SidebarFolder = ({ name, open, onToggle, onContextMenu, children = undefin
       </Collapse>
     </Fragment>
   );
-};
-
-export default SidebarFolder;
+}

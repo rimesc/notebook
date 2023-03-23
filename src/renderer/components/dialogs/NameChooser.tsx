@@ -9,7 +9,7 @@ interface Props {
   onCancel: () => void;
 }
 
-const NameChooser = ({ placeholder, originalName = '', validate, onSubmit, onCancel }: Props) => {
+export default function NameChooser({ placeholder, originalName = '', validate, onSubmit, onCancel }: Props) {
   const [name, setName] = useState(originalName);
 
   useEffect(() => setName(originalName), [originalName]);
@@ -59,6 +59,4 @@ const NameChooser = ({ placeholder, originalName = '', validate, onSubmit, onCan
       />
     </Box>
   );
-};
-
-export default NameChooser;
+}

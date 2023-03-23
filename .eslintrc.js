@@ -12,13 +12,6 @@ module.exports = {
     // The default no-unused-vars rule wrongly flags arguments in function type declarations
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
-    'react/function-component-definition': [
-      'error',
-      {
-        namedComponents: 'arrow-function',
-        unnamedComponents: 'arrow-function',
-      },
-    ],
     'react/require-default-props': [
       'error',
       {

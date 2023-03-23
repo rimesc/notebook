@@ -17,7 +17,7 @@ interface Props {
 /**
  * Sidebar displaying a list of collapsible folders with their files.
  */
-const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
+export default function Sidebar({ width, workspace, selected, onSelect }: Props) {
   const [folders, setFolders] = useState<string[] | undefined>(undefined);
   const [open, setOpen] = useState<string | undefined>(undefined);
   const [notes, dispatch] = useReducer(
@@ -168,6 +168,4 @@ const Sidebar = ({ width, workspace, selected, onSelect }: Props) => {
       </div>
     </Drawer>
   );
-};
-
-export default Sidebar;
+}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const CreateNote = () => {
+export default function CreateNote() {
   const [folder, setFolder] = useState<string | undefined>(undefined);
   const [files, setFiles] = useState<string[] | undefined>(undefined);
 
@@ -33,6 +33,4 @@ const CreateNote = () => {
       onCancel={window.electron.closeDialog}
     />
   );
-};
-
-export default CreateNote;
+}

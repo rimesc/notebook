@@ -9,7 +9,7 @@ interface Props {
   mode: Mode | undefined;
 }
 
-const NoteDisplay = ({ note, mode }: Props) => {
+export default function NoteDisplay({ note, mode }: Props) {
   const [content, setContent] = useState<string | undefined>(undefined);
 
   const doSave = useDebouncedCallback((noteToSave: NoteKey, newContent: string) => {
@@ -50,6 +50,4 @@ const NoteDisplay = ({ note, mode }: Props) => {
   } else {
     return null;
   }
-};
-
-export default NoteDisplay;
+}

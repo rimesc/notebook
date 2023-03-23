@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import NameChooser from './NameChooser';
 
-const CreateFolder = () => {
+export default function CreateFolder() {
   const [folders, setFolders] = useState<string[] | undefined>(undefined);
 
   useEffect(() => {
@@ -25,6 +25,4 @@ const CreateFolder = () => {
       onCancel={window.electron.closeDialog}
     />
   );
-};
-
-export default CreateFolder;
+}
