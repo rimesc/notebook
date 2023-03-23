@@ -45,10 +45,10 @@ const NoteDisplay = ({ note, mode }: Props) => {
       case 'edit':
         return <Editor markdown={content} onChange={handleContentChange} />;
       default:
-        return <></>;
+        return null;
     }
   } else {
-    return <></>;
+    return null;
   }
 };
 

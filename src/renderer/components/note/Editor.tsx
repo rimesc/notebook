@@ -27,9 +27,7 @@ const Editor = ({ markdown, onChange }: Props) => {
             value={markdown}
             onChange={(event) => onChange(event.target.value)}
           />
-        ) : (
-          <></>
-        )}
+        ) : null}
       </Box>
     </Box>
   );

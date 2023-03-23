@@ -72,7 +72,7 @@ const MainViewWithSnackBar = () => {
   );
 };
 
-export default function App() {
+const App = () => {
   return (
     <HashRouter>
       <Routes>
@@ -84,4 +84,6 @@ export default function App() {
       </Routes>
     </HashRouter>
   );
-}
+};
+
+export default App;

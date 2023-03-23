@@ -42,7 +42,7 @@ const Viewer = ({ markdown }: Props) => {
       <Box sx={{ p: 3 }}>
         {
           // eslint-disable-next-line react/no-danger
-          markdown ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }} /> : <></>
+          markdown ? <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(md.render(markdown)) }} /> : null
         }
       </Box>
     </Box>
