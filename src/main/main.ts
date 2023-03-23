@@ -16,6 +16,7 @@ import showDialog from './dialogs';
 import {
   createFolder,
   createNote,
+  deleteNote,
   fetchNote,
   listFolders,
   listNotes,
@@ -83,6 +84,15 @@ ipcMain.on(
   })
 );
 ipcMain.on(
+  'delete-note',
+  errorAwareAsyncHandler(async (_, folder, note) => {
+    if (folder && note) {
+      await deleteNote(folder, note);
+      mainWindow?.webContents.send('deleted-note', folder, note);
+    }
+  })
+);
+ipcMain.on(
   'create-folder',
   errorAwareAsyncHandler(async (_, folder) => {
     if (folder) {
@@ -110,9 +120,9 @@ ipcMain.on('show-note-menu', (_, folder, note) => {
     noteMenu(folder, note, mainWindow).popup({ window: mainWindow });
   }
 });
-ipcMain.on('show-dialog', (_, dialog, ...args) => {
+ipcMain.on('show-dialog', (_, dialog, style, ...args) => {
   if (mainWindow) {
-    showDialog(dialog, { width: 480, height: 128, parent: mainWindow }, ...args);
+    showDialog(dialog, { style, parent: mainWindow }, ...args);
   }
 });
 

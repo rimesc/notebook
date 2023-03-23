@@ -192,6 +192,26 @@ export async function renameNote(folder: string, file: string, newFile: string):
 }
 
 /**
+ * Deletes a note.
+ * @param folder name of the folder containing the note.
+ * @param file name of the note.
+ */
+export async function deleteNote(folder: string, file: string): Promise<void> {
+  log.debug(`Attempting to delete <${folder}/${file}>`);
+  const pathToNote = filePath(folder, file);
+  try {
+    await fs.rm(pathToNote);
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Note '${file}' not found in folder '${folder}'`);
+      default:
+        throw error;
+    }
+  }
+}
+
+/**
  * Creates a new folder.
  * @param folder name of the new folder.
  * @throws if a folder with the given name already exists in the workspace

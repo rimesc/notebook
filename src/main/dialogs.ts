@@ -13,14 +13,21 @@ const commonWindowOptions: BrowserWindowConstructorOptions = {
   },
 };
 
-interface Options {
-  width: number;
-  height: number;
+export type DialogStyle = 'question' | 'textInput';
+
+interface DialogOptions {
+  style: DialogStyle;
   parent: BrowserWindow;
 }
 
-function show(id: string, options: Options, ...args: unknown[]): void {
-  const modal = new BrowserWindow({ ...commonWindowOptions, ...options });
+const styles: { [style in DialogStyle]: BrowserWindowConstructorOptions } = {
+  question: { width: 360, height: 180 },
+  textInput: { width: 480, height: 128 },
+};
+
+function show(id: string, options: DialogOptions, ...args: unknown[]): void {
+  const { style, parent } = options;
+  const modal = new BrowserWindow({ ...commonWindowOptions, ...styles[style], parent });
   modal.loadURL(resolveHtmlPath('index.html', `/${id}`));
   modal.on('ready-to-show', () => {
     modal.webContents.send(`init-dialog`, ...args);
