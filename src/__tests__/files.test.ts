@@ -4,6 +4,7 @@ import temp from 'tempy';
 import {
   createFolder,
   createNote,
+  deleteNote,
   fetchNote,
   listFolders,
   listNotes,
@@ -151,6 +152,20 @@ describe('renameNote', () => {
     );
     const originalPath = path.join(workspace, 'Folder', 'Original note.md');
     expect(fs.existsSync(originalPath)).toBeTruthy();
+  });
+});
+
+describe('deleteNote', () => {
+  it('deletes the markdown file', async () => {
+    await createFolder('Folder');
+    await createNote('Folder', 'Note');
+    const originalPath = path.join(workspace, 'Folder', 'Note.md');
+    expect(fs.existsSync(originalPath)).toBeTruthy();
+    await deleteNote('Folder', 'Note');
+    expect(fs.existsSync(originalPath)).toBeFalsy();
+  });
+  it('throws if the note does not exist', async () => {
+    await expect(deleteNote('Folder', 'Note')).rejects.toThrow("Note 'Note' not found in folder 'Folder'");
   });
 });
 

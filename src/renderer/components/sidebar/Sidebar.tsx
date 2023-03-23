@@ -11,7 +11,7 @@ interface Props {
   width: number;
   workspace: string | undefined;
   selected: NoteKey | undefined;
-  onSelect: (note: NoteKey) => void;
+  onSelect: (note: NoteKey | undefined) => void;
 }
 
 /**
@@ -58,22 +58,35 @@ export default function Sidebar({ width, workspace, selected, onSelect }: Props)
       // If the command is triggered from the main menu, target the currently open folder (if any).
       const targetFolder = folder ?? open;
       if (targetFolder) {
-        window.electron.showDialog('create-note', targetFolder);
+        window.electron.showDialog('create-note', 'textInput', targetFolder);
       }
     })
   );
 
   // Display modal dialog to choose a name when 'New Folder...' menu item is triggered.
-  useEffect(() => window.electron.onMenuCommandNewFolder(() => window.electron.showDialog('create-folder')));
+  useEffect(() =>
+    window.electron.onMenuCommandNewFolder(() => window.electron.showDialog('create-folder', 'textInput'))
+  );
 
   // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a note.
   useEffect(() =>
-    window.electron.onMenuCommandRenameNote((folder, note) => window.electron.showDialog('rename-note', folder, note))
+    window.electron.onMenuCommandRenameNote((folder, note) =>
+      window.electron.showDialog('rename-note', 'textInput', folder, note)
+    )
+  );
+
+  // Display modal dialog to confirm when 'Delete' menu item is triggered on a note.
+  useEffect(() =>
+    window.electron.onMenuCommandDeleteNote((folder, note) =>
+      window.electron.showDialog('delete-note', 'question', folder, note)
+    )
   );
 
   // Display modal dialog to choose a new name when 'Rename...' menu item is triggered on a folder.
   useEffect(() =>
-    window.electron.onMenuCommandRenameFolder((folder) => window.electron.showDialog('rename-folder', folder))
+    window.electron.onMenuCommandRenameFolder((folder) =>
+      window.electron.showDialog('rename-folder', 'textInput', folder)
+    )
   );
 
   // Refresh list of folders when a new folder has been created.
@@ -96,7 +109,17 @@ export default function Sidebar({ width, workspace, selected, onSelect }: Props)
   // Refresh list of folders when a folder has been renamed.
   useEffect(() => window.electron.onRenamedFolder(loadFolders));
 
-  // Refresh list of notes for the affected folder when a note has been renamed.
+  // Refresh list of notes for the affected folder when a note has been deleted.
+  useEffect(() =>
+    window.electron.onDeletedNote(async (folder, note) => {
+      await loadNotes(folder);
+      if (selected?.folder === folder && selected.note === note) {
+        onSelect(undefined);
+      }
+    })
+  );
+
+  // Refresh list of notes for the affected folder when a note has been deleted.
   useEffect(() => window.electron.onRenamedNote(loadNotes));
 
   const handleFolderClick = (folder: string) => {

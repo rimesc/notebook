@@ -28,6 +28,10 @@ export const noteMenu = (folder: string, note: string, mainWindow: BrowserWindow
       label: '&Rename...',
       click: async () => mainWindow.webContents.send('menu-command:rename-note', folder, note),
     },
+    {
+      label: '&Delete',
+      click: async () => mainWindow.webContents.send('menu-command:delete-note', folder, note),
+    },
   ]);
 
 export default class MenuBuilder {
