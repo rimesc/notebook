@@ -16,6 +16,7 @@ import showDialog from './dialogs';
 import {
   createFolder,
   createNote,
+  deleteFolder,
   deleteNote,
   fetchNote,
   listFolders,
@@ -107,6 +108,15 @@ ipcMain.on(
     if (folder && newName) {
       await renameFolder(folder, newName);
       mainWindow?.webContents.send('renamed-folder', newName);
+    }
+  })
+);
+ipcMain.on(
+  'delete-folder',
+  errorAwareAsyncHandler(async (_, folder) => {
+    if (folder) {
+      await deleteFolder(folder);
+      mainWindow?.webContents.send('deleted-folder', folder);
     }
   })
 );

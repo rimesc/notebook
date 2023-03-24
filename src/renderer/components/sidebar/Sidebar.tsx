@@ -89,11 +89,28 @@ export default function Sidebar({ width, workspace, selected, onSelect }: Props)
     )
   );
 
+  // Display modal dialog to confirm when 'Delete' menu item is triggered on a folder.
+  useEffect(() =>
+    window.electron.onMenuCommandDeleteFolder((folder) =>
+      window.electron.showDialog('delete-folder', 'question', folder)
+    )
+  );
+
   // Refresh list of folders when a new folder has been created.
   useEffect(() =>
     window.electron.onCreatedFolder(async (folder) => {
       await loadFolders();
       setOpen(folder);
+    })
+  );
+
+  // Refresh list of folders when a folder has been deleted.
+  useEffect(() =>
+    window.electron.onDeletedFolder(async (folder) => {
+      await loadFolders();
+      if (open === folder) {
+        setOpen(undefined);
+      }
     })
   );
 

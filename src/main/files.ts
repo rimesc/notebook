@@ -212,6 +212,25 @@ export async function deleteNote(folder: string, file: string): Promise<void> {
 }
 
 /**
+ * Deletes a folder, including all of its notes.
+ * @param folder name of the folder.
+ */
+export async function deleteFolder(folder: string): Promise<void> {
+  log.debug(`Attempting to delete <${folder}>`);
+  const pathToFolder = folderPath(folder);
+  try {
+    await fs.rm(pathToFolder, { recursive: true });
+  } catch (error) {
+    switch (errorCode(error)) {
+      case 'ENOENT':
+        throw new Error(`Folder '${folder}' not found`);
+      default:
+        throw error;
+    }
+  }
+}
+
+/**
  * Creates a new folder.
  * @param folder name of the new folder.
  * @throws if a folder with the given name already exists in the workspace

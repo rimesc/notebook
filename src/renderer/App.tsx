@@ -6,6 +6,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import CreateFolder from './components/dialogs/CreateFolder';
 import CreateNote from './components/dialogs/CreateNote';
+import DeleteFolder from './components/dialogs/DeleteFolder';
 import DeleteNote from './components/dialogs/DeleteNote';
 import RenameFolder from './components/dialogs/RenameFolder';
 import RenameNote from './components/dialogs/RenameNote';
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/delete-note" element={<DeleteNote />} />
         <Route path="/create-folder" element={<CreateFolder />} />
         <Route path="/rename-folder" element={<RenameFolder />} />
+        <Route path="/delete-folder" element={<DeleteFolder />} />
       </Routes>
     </HashRouter>
   );
