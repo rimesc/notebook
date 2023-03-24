@@ -20,6 +20,10 @@ export const folderMenu = (folder: string, mainWindow: BrowserWindow) =>
       label: '&Rename...',
       click: async () => mainWindow.webContents.send('menu-command:rename-folder', folder),
     },
+    {
+      label: '&Delete',
+      click: async () => mainWindow.webContents.send('menu-command:delete-folder', folder),
+    },
   ]);
 
 export const noteMenu = (folder: string, note: string, mainWindow: BrowserWindow) =>
