@@ -1,5 +1,5 @@
 /* eslint no-console: off */
-import { ExpandLess, ExpandMore, Folder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, FolderOutlined } from '@mui/icons-material';
 import { Collapse, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Fragment, MouseEvent, ReactNode } from 'react';
 
@@ -28,7 +28,7 @@ export default function SidebarFolder({ name, open, onToggle, onContextMenu, chi
       <ListItem key={name} disablePadding>
         <ListItemButton onClick={onToggle} onAuxClick={handleFolderAuxClick}>
           <ListItemIcon>
-            <Folder />
+            <FolderOutlined color="primary" />
           </ListItemIcon>
           <ListItemText primary={name} />
           {open ? <ExpandLess /> : <ExpandMore />}

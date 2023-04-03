@@ -1,5 +1,5 @@
 /* eslint no-console: off */
-import { Article } from '@mui/icons-material';
+import { ArticleOutlined } from '@mui/icons-material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { MouseEvent } from 'react';
 
@@ -32,7 +32,7 @@ export default function SidebarNote({ name, selected, onSelect, onContextMenu }:
     <ListItem key={name} disablePadding>
       <ListItemButton selected={selected} sx={{ pl: 4 }} onClick={handleClick} onAuxClick={handleAuxClick}>
         <ListItemIcon>
-          <Article />
+          <ArticleOutlined color="primary" />
         </ListItemIcon>
         <ListItemText primary={name} />
       </ListItemButton>
